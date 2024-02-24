@@ -1,4 +1,6 @@
+#%% Visualization
 import pandas as pd
+import matplotlib.pyplot as plt
 
 class CleanData:
     '''
@@ -13,26 +15,28 @@ class CleanData:
         '''
         self.data = data
 
-    def _clean_data(self):
+    def clean_data(self):
         '''
         Cleans the data
         :return:
         '''
 
         #Read the file passed in constructor
-        housing_data = pd.read_csv(self.data)
+        df = pd.read_csv(self.data)
+
+        #Drop unnecessary columns
+        df_drop_cols = df.drop(['area_type','society','availability'],axis='columns')
 
         #Drop null values
-        housing_data.dropna()
+        df_drop_null = df_drop_cols.dropna()
 
-        #Drop duplicated values
-        housing_data.drop_duplicates()
-
-        print(housing_data)
+        # Return the cleaned DataFrame
+        return df_drop_null
 
 
 
 if __name__ == '__main__':
-    cd = CleanData('ParisHousing.csv')
+    cd = CleanData('bengaluru_house_prices.csv')
 
-    cd._clean_data()
+    # Capture the cleaned DataFrame
+    cleaned_data = cd.clean_data()
