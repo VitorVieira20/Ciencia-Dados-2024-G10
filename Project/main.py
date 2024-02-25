@@ -43,17 +43,16 @@ class CleanData:
         # ->Values in Sqr Yards: 151.11Sq. Yards
         # So were gonna make all of them in a single value like the first example
         df_range_ave = df_drop_size.copy()
-        df_range_ave['total_sqft'] = df_drop_size['total_sqft'].apply(self._range_average)
-
-        print(df_range_ave.loc[410])
-        print(df_range_ave.loc[8273])
+        df_range_ave['total_sqft'] = df_drop_size['total_sqft'].apply(self._convert_values)
 
         # Return the cleaned DataFrame
         return df_drop_size
 
-    def _range_average(self, x):
+    def _convert_values(self, x):
         '''
         Calculates the average of a given range like 2100 - 2500
+        Converts Sqr. Meter to Sqr. Feat
+        Converts Sqr. Yard to Sqr. Feat
         :param x:
         :return:
         '''
