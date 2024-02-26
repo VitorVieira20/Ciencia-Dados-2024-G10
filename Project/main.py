@@ -36,17 +36,39 @@ class CleanData:
         # Drop size column because we have now the bedroom column
         df_drop_size = df_drop_null.drop(['size'], axis='columns')
 
-        # In the column total_sqt are many types of values
-        # ->Single values: 2400
-        # ->Range values: 2100 - 2600
-        # ->Values in Sqr Meter: 34.46Sq. Meter
-        # ->Values in Sqr Yards: 151.11Sq. Yards
-        # So were gonna make all of them in a single value like the first example
-        df_range_ave = df_drop_size.copy()
-        df_range_ave['total_sqft'] = df_drop_size['total_sqft'].apply(self._convert_values)
+        '''
+        In the column total_sqt are many types of values
+            ->Single values: 2400
+            ->Range values: 2100 - 2600
+            ->Values in Sqr Meter: 34.46Sq. Meter
+            ->Values in Sqr Yards: 151.11Sq. Yards
+        So were gonna make all of them in a single value like the first example
+        '''
+        df_conv_val = df_drop_size.copy()
+        df_conv_val['total_sqft'] = df_drop_size['total_sqft'].apply(self._convert_values)
+
+        # Remove NaN values
+        df_conv_val_cleaned = df_conv_val.dropna()
+
+        '''
+        The following steps is for Dimensional Reduction
+        We're gonna drop the locations with less than 10 rows of data
+        '''
+
+        # Order by "location" column
+        df_conv_val_cleaned_sorted = df_conv_val_cleaned.sort_values(by='location')
+
+        # Group by 'location' and count rows number
+        location_counts = df_conv_val_cleaned_sorted.groupby('location').size()
+
+        # Filter by location with more or equal 10 rows
+        valid_locations = location_counts[location_counts >= 10].index.tolist()
+
+        # Filter DataFrame with valid locations
+        df_filtered = df_conv_val_cleaned_sorted[df_conv_val_cleaned_sorted['location'].isin(valid_locations)]
 
         # Return the cleaned DataFrame
-        return df_drop_size
+        return df_filtered
 
     def _convert_values(self, x):
         '''
@@ -62,11 +84,6 @@ class CleanData:
         else:
             # 142.84Sq. Meter
             # 300Sq. Yards
-            # 6Acres
-            # 38Guntha
-            # 1Grounds
-            # 1500Cents
-            # 4125Perch
             if 'Sq. Meter' in x:
                 # Split the Sq. Meter text from the number
                 numeric_part = x.split('Sq. Meter')[0].strip()
@@ -83,7 +100,13 @@ class CleanData:
                     sqy_value = float(numeric_value)
                     sqft_value = sqy_value * 9
                     return sqft_value
-            return None
+            else:
+                # Normal values
+                try:
+                    return pd.to_numeric(x)
+                # Other values, like Acres, Perch, etc.
+                except ValueError:
+                    return None
 
 
 if __name__ == '__main__':
