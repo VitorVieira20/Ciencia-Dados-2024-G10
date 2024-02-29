@@ -3,11 +3,8 @@ import matplotlib.pyplot as plt
 import matplotlib
 import numpy as np
 from sklearn.preprocessing import StandardScaler
-import seaborn as sns
+from scipy.stats import ttest_ind, f_oneway, ttest_rel
 from sklearn.decomposition import PCA
-from sklearn.manifold import TSNE
-from sklearn.manifold import LocallyLinearEmbedding
-from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 import umap
 
 class CleanData:
@@ -244,6 +241,58 @@ class DimensionalityReduction:
         plt.grid(True)
         plt.show()
 
+class HypothesisTester:
+    """
+    The t-test assumes that the data is normally distributed and that the variances are equal between groups (for
+    unpaired t-test) or within groups (for paired t-test).
+    The ANOVA test assumes that the data is normally distributed and that the variances are equal between groups.
+    """
+    def unpaired_t_test(self, group1, group2):
+        """
+        Perform unpaired t-test for two groups.
+
+        Parameters:
+        - group1: List or array-like object containing data for group 1.
+        - group2: List or array-like object containing data for group 2.
+
+        Returns:
+        - t_statistic: The calculated t-statistic.
+        - p_value: The p-value associated with the t-statistic.
+        """
+        t_statistic, p_value = ttest_ind(group1, group2)
+        return t_statistic, p_value
+
+    def unpaired_anova(self, *groups):
+        """
+        Perform unpaired ANOVA for more than two groups.
+
+        Parameters:
+        - *groups: Variable length argument containing data for each group. Each argument should be a list or array-like
+        object.
+
+        Returns:
+        - f_statistic: The calculated F-statistic.
+        - p_value: The p-value associated with the F-statistic.
+        """
+        f_statistic, p_value = f_oneway(*groups)
+        return f_statistic, p_value
+
+    def paired_t_test(self, group1, group2):
+        """
+        Perform paired t-test for two groups.
+
+        Parameters:
+        - group1: List or array-like object containing data for group 1.
+        - group2: List or array-like object containing data for group 2.
+                  Should have the same length as group1.
+
+        Returns:
+        - t_statistic: The calculated t-statistic.
+        - p_value: The p-value associated with the t-statistic.
+        """
+        t_statistic, p_value = ttest_rel(group1, group2)
+        return t_statistic, p_value
+
 if __name__ == '__main__':
     # Initialize CleanData object
     cd = CleanData('bengaluru_house_prices.csv')
@@ -281,3 +330,35 @@ if __name__ == '__main__':
 
     dr.plot_projection(dr.compute_pca(), 'PCA Projection')
     dr.plot_projection(dr.compute_umap(), 'UMAP Projection')
+
+    # Prices per SQq. feet for three locations
+    price_sqft_Rajaji_Nagar = second_outliers[second_outliers['location'] == 'Rajaji Nagar']['price_per_sqft']
+    price_sqft_Hebbal = second_outliers[second_outliers['location'] == 'Hebbal']['price_per_sqft']
+    price_sqft_Yeshwanthpur = second_outliers[second_outliers['location'] == 'Yeshwanthpur']['price_per_sqft']
+
+    # Prices for Rajaji Nagar location
+    price_Rajaji_Nagar = second_outliers[second_outliers['location'] == 'Rajaji Nagar']['price']
+
+    # Total Sq. Feet for Rajaji Nagar location
+    total_sqft_Rajaji_Nagar = second_outliers[second_outliers['location'] == 'Rajaji Nagar']['total_sqft']
+
+    # Initialize the HypothesisTester class with the data
+    tester = HypothesisTester()
+
+    # Perform unpaired t-test between Hebbal and Rajaji Nagar locations
+    t_stat, p_val = tester.unpaired_t_test(price_sqft_Hebbal, price_sqft_Rajaji_Nagar)
+    print("\nUnpaired t-test between Hebbal and Rajaji Nagar locations:")
+    print("t-statistic:", t_stat)
+    print("p-value:", p_val)
+
+    # Perform unpaired ANOVA among the three locations
+    f_stat, p_val_anova = tester.unpaired_anova(price_sqft_Rajaji_Nagar, price_sqft_Hebbal, price_sqft_Yeshwanthpur)
+    print("\nUnpaired ANOVA among three locations:")
+    print("F-statistic:", f_stat)
+    print("p-value:", p_val_anova)
+
+    # Perform paired t-test for total_sqft and price within Rajaji Nagar location
+    t_stat, p_val = tester.paired_t_test(total_sqft_Rajaji_Nagar, price_Rajaji_Nagar)
+    print("\nPaired t-test for total_sqft and price within Rajaji Nagar location:")
+    print("t-statistic:", t_stat)
+    print("p-value:", p_val)
