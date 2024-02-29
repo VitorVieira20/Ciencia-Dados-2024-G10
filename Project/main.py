@@ -8,6 +8,7 @@ from sklearn.decomposition import PCA
 from sklearn.manifold import TSNE
 from sklearn.manifold import LocallyLinearEmbedding
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
+import umap
 
 class CleanData:
     '''
@@ -211,43 +212,21 @@ class DimensionalityReduction:
         """
         return PCA(n_components=n_components).fit_transform(self.data)
 
-    def compute_lda(self, n_components=2):
+    def compute_umap(self, n_components=2, n_neighbors=8, min_dist=0.5, metric='euclidean'):
         """
-        Perform Linear Discriminant Analysis (LDA) on the input data.
-
-        Parameters:
-        - n_components: The number of components to keep
-
-        Returns:
-            array-like: The reduced-dimensional representation of the data using LDA.
-        """
-        return LinearDiscriminantAnalysis(n_components=n_components).fit_transform(self.data, self.targets)
-
-    def compute_tsne(self, n_components=2, perplexity=3):
-        """
-        Compute t-Distributed Stochastic Neighbor Embedding (t-SNE) on the dataset.
-
-        Parameters:
-        - n_components: The number of components to embed the data into.
-        - perplexity: The perplexity parameter for t-SNE.
-
-        Returns:
-        - tsne_projection: The projected data using t-SNE.
-        """
-        return TSNE(n_components=n_components, perplexity=perplexity).fit_transform(self.data)
-
-    def compute_lle(self, n_components=2, n_neighbors=20):
-        """
-        Compute Locally Linear Embedding (LLE) on the dataset.
+        Compute Uniform Manifold Approximation and Projection (UMAP) on the dataset.
 
         Parameters:
         - n_components: The number of components to embed the data into.
         - n_neighbors: The number of neighbors to consider for each point.
+        - min_dist: The minimum distance between embedded points.
+        - metric: The distance metric to use.
 
         Returns:
-        - lle_projection: The projected data using LLE.
+        - umap_projection: The projected data using UMAP.
         """
-        return LocallyLinearEmbedding(n_neighbors=n_neighbors, n_components=n_components).fit_transform(self.data)
+        return umap.UMAP(n_components=n_components, n_neighbors=n_neighbors, min_dist=min_dist,
+                         metric=metric).fit_transform(self.data)
 
     def plot_projection(self, projection, title):
         """
@@ -300,5 +279,5 @@ if __name__ == '__main__':
     # Initialize DimensionalityReduction object
     dr = DimensionalityReduction(np.array(data), targets)
 
-
     dr.plot_projection(dr.compute_pca(), 'PCA Projection')
+    dr.plot_projection(dr.compute_umap(), 'UMAP Projection')
