@@ -5,6 +5,9 @@ import numpy as np
 from sklearn.preprocessing import StandardScaler
 import seaborn as sns
 from sklearn.decomposition import PCA
+from sklearn.manifold import TSNE
+from sklearn.manifold import LocallyLinearEmbedding
+from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 
 class CleanData:
     '''
@@ -22,7 +25,7 @@ class CleanData:
     def clean_data(self):
         '''
         Cleans the data
-        :return:
+        :return: Cleaned Dataset
         '''
 
         # Read the file passed in constructor
@@ -78,10 +81,10 @@ class CleanData:
         Many business managers will tell you that average sqft per bedroom is 300
         With this, we will remove some outliers
         '''
-        df_remove_first_ouliers = df_filtered[~(df_filtered.total_sqft / df_filtered.bedroom < 300)]
+        df_remove_first_outliers = df_filtered[~(df_filtered.total_sqft / df_filtered.bedroom < 300)]
 
         # Return the cleaned DataFrame
-        return df_remove_first_ouliers
+        return df_remove_first_outliers
 
     def _convert_values(self, x):
         '''
@@ -127,9 +130,9 @@ class RemoveOutliers:
     '''
     def remove_prices_outliers(self, df):
         '''
-        Remove ouliers per location using mean and one standard deviation
-        :param df:
-        :return:
+        Remove outliers per location using mean and one standard deviation
+        :param df: DataFrame to remove the outliers
+        :return: Cleaned DataFrame
         '''
         df_out = pd.DataFrame()
         for key, subdf in df.groupby('location'):
@@ -143,8 +146,8 @@ class RemoveOutliers:
         '''
         Removes more outliers based on the price and the bedrooms number
         We remove the data where 2 bedrooms apartments whose price_per_sqft is less than mean of 1 bedroom apartment
-        :param df:
-        :return:
+        :param df: DataFrame to remove the outliers
+        :return: Cleaned DataFrame
         '''
         exclude_indices = np.array([])
         for location, location_df in df.groupby('location'):
@@ -170,17 +173,18 @@ class VisualizeData:
     def plot_scatter_chart(self, df, location):
         '''
         Shows the scatter plot of a certain locations based on their 2 and 3 bedrooms data
-        :param df:
-        :param location:
+        :param df: DataFrame containing all the data
+        :param location: Specific location in the DataFrame
         '''
         bed2 = df[(df['location'] == location) & (df['bedroom'] == 2)]
         bed3 = df[(df['location'] == location) & (df['bedroom'] == 3)]
         matplotlib.rcParams['figure.figsize'] = (15, 10)
         plt.scatter(bed2['total_sqft'], bed2['price'], color='blue', label='2 Bedroom', s=50)
-        plt.scatter(bed3['total_sqft'], bed3['price'], marker='+', color='green', label='3 Bedroom', s=50)
+        plt.scatter(bed3['total_sqft'], bed3['price'], marker='p', color='red', label='3 Bedroom', s=50)
         plt.xlabel("Total Square Feet Area")
         plt.ylabel("Price (Lakh Indian Rupees)")
         plt.title(location)
+        plt.legend()
         plt.show()
 
 class DimensionalityReduction:
@@ -207,43 +211,94 @@ class DimensionalityReduction:
         """
         return PCA(n_components=n_components).fit_transform(self.data)
 
+    def compute_lda(self, n_components=2):
+        """
+        Perform Linear Discriminant Analysis (LDA) on the input data.
+
+        Parameters:
+        - n_components: The number of components to keep
+
+        Returns:
+            array-like: The reduced-dimensional representation of the data using LDA.
+        """
+        return LinearDiscriminantAnalysis(n_components=n_components).fit_transform(self.data, self.targets)
+
+    def compute_tsne(self, n_components=2, perplexity=3):
+        """
+        Compute t-Distributed Stochastic Neighbor Embedding (t-SNE) on the dataset.
+
+        Parameters:
+        - n_components: The number of components to embed the data into.
+        - perplexity: The perplexity parameter for t-SNE.
+
+        Returns:
+        - tsne_projection: The projected data using t-SNE.
+        """
+        return TSNE(n_components=n_components, perplexity=perplexity).fit_transform(self.data)
+
+    def compute_lle(self, n_components=2, n_neighbors=20):
+        """
+        Compute Locally Linear Embedding (LLE) on the dataset.
+
+        Parameters:
+        - n_components: The number of components to embed the data into.
+        - n_neighbors: The number of neighbors to consider for each point.
+
+        Returns:
+        - lle_projection: The projected data using LLE.
+        """
+        return LocallyLinearEmbedding(n_neighbors=n_neighbors, n_components=n_components).fit_transform(self.data)
+
+    def plot_projection(self, projection, title):
+        """
+        Plot the 2D projection of the dataset.
+
+        Parameters:
+        - projection: The projected data.
+        - title: The title of the plot.
+        """
+        plt.figure(figsize=(8, 6))
+        plt.scatter(projection[:, 0], projection[:, 1], c=self.targets, alpha=0.5)
+        plt.title(title)
+        plt.xlabel('Component 1')
+        plt.ylabel('Component 2')
+        plt.grid(True)
+        plt.show()
+
 if __name__ == '__main__':
-    # Initialize CleanData class
+    # Initialize CleanData object
     cd = CleanData('bengaluru_house_prices.csv')
 
     # Capture the cleaned DataFrame
     cleaned_data = cd.clean_data()
 
-    # Initialize the RemoveOutliers class
+    # Initialize the RemoveOutliers object
     rm = RemoveOutliers()
 
-    # Initialize the VisualizeData class
+    # Initialize the VisualizeData object
     vd = VisualizeData()
 
     # Removes first demand of outliers
     first_outliers = rm.remove_prices_outliers(cleaned_data)
 
     # See the scatter plots before the second removal
-    print(vd.plot_scatter_chart(first_outliers, "Rajaji Nagar"))
-    print(vd.plot_scatter_chart(first_outliers, "Hebbal"))
-    print(vd.plot_scatter_chart(first_outliers, "Yeshwanthpur"))
+    vd.plot_scatter_chart(first_outliers, "Rajaji Nagar")
+    vd.plot_scatter_chart(first_outliers, "Hebbal")
+    vd.plot_scatter_chart(first_outliers, "Yeshwanthpur")
 
     # Removes second demand of outliers
     second_outliers = rm.remove_bedroom_outliers(first_outliers)
 
     # See the scatter plots after the second removal
-    print(vd.plot_scatter_chart(second_outliers, "Rajaji Nagar"))
-    print(vd.plot_scatter_chart(second_outliers, "Hebbal"))
-    print(vd.plot_scatter_chart(second_outliers, "Yeshwanthpur"))
+    vd.plot_scatter_chart(second_outliers, "Rajaji Nagar")
+    vd.plot_scatter_chart(second_outliers, "Hebbal")
+    vd.plot_scatter_chart(second_outliers, "Yeshwanthpur")
 
-
-    '''
     data = second_outliers[['total_sqft', 'bath', 'balcony', 'bedroom', 'price_per_sqft']]
-    targets = second_outliers['location']
+    targets = second_outliers['price']
 
-    # Inicialize o objeto DimensionalityReduction
-    dr = DimensionalityReduction(data, targets)
+    # Initialize DimensionalityReduction object
+    dr = DimensionalityReduction(np.array(data), targets)
 
-    # Compute PCA
-    pca_projection = dr.compute_pca(n_components=2)
-    '''
+
+    dr.plot_projection(dr.compute_pca(), 'PCA Projection')
