@@ -6,6 +6,11 @@ from sklearn.preprocessing import StandardScaler
 from scipy.stats import ttest_ind, f_oneway, ttest_rel
 from sklearn.decomposition import PCA
 import umap
+from sklearn.linear_model import LinearRegression, Ridge
+from sklearn.tree import DecisionTreeRegressor
+from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
+from sklearn.svm import SVR
+from sklearn.model_selection import cross_val_score
 
 class CleanData:
     '''
@@ -293,6 +298,40 @@ class HypothesisTester:
         t_statistic, p_value = ttest_rel(group1, group2)
         return t_statistic, p_value
 
+class ModelSelection:
+    """
+    A class to perform model selection for regression problems.
+    """
+    def __init__(self, X, y):
+        """
+        Initializes the ModelSelection object with the features and target variable.
+
+        :param X: The input features.
+        :param y: The target variable.
+        """
+        self.X = X
+        self.y = y
+
+    def select_model(self):
+        """
+        Performs model selection by training various models and evaluating them using Mean Squared Error.
+        The models used are: Linear Regression, Decision Tree Regression, Random Forest Regression,
+        Gradient Boosting Regression, and Support Vector Regression.
+        """
+        # Create a list of models to evaluate
+        models = [LinearRegression(), DecisionTreeRegressor(), RandomForestRegressor(), GradientBoostingRegressor(),
+                  SVR(), Ridge()]
+
+        for model in models:
+            # Perform K-Fold Cross Validation
+            scores = cross_val_score(model, self.X, self.y, cv=10, scoring='neg_mean_squared_error')
+
+            # Calculate Mean Squared Error
+            mse_scores = -scores
+
+            # Print the model name and its Mean Squared Error
+            print(f'Model: {model.__class__.__name__}, Mean Squared Error: {mse_scores.mean()}')
+
 if __name__ == '__main__':
     # Initialize CleanData object
     cd = CleanData('bengaluru_house_prices.csv')
@@ -362,3 +401,54 @@ if __name__ == '__main__':
     print("\nPaired t-test for total_sqft and price within Rajaji Nagar location:")
     print("t-statistic:", t_stat)
     print("p-value:", p_val)
+
+    # 10 new features
+
+    # Price distribution per bedroom.
+    second_outliers['price_per_bedroom'] = second_outliers['price'] / second_outliers['bedroom']
+
+    # Bathroom to bedroom ratio.
+    second_outliers['bath_per_bedroom'] = second_outliers['bath'] / second_outliers['bedroom']
+
+    # Space distribution per bedroom.
+    second_outliers['total_sqft_per_bedroom'] = second_outliers['total_sqft'] / second_outliers['bedroom']
+
+    # Balcony to bedroom ratio
+    second_outliers['balcony_per_bedroom'] = second_outliers['balcony'] / second_outliers['bedroom']
+
+    # Price distribution per bathroom
+    second_outliers['price_per_bath'] = second_outliers['price'] / second_outliers['bath']
+
+    # Space distribution per bathroom
+    second_outliers['total_sqft_per_bath'] = second_outliers['total_sqft'] / second_outliers['bath']
+
+    # Balcony to bathroom ratio
+    second_outliers['balcony_per_bath'] = second_outliers['balcony'] / second_outliers['bath']
+
+    # Price distribution per balcony
+    second_outliers['price_per_balcony'] = second_outliers['price'] / second_outliers['balcony']
+
+    # Space distribution per balcony
+    second_outliers['total_sqft_per_balcony'] = second_outliers['total_sqft'] / second_outliers['balcony']
+
+    # Bedroom to bathroom ratio
+    second_outliers['bedroom_per_bath'] = second_outliers['bedroom'] / second_outliers['bath']
+
+    # Model selection
+    second_outliers_encoded = pd.get_dummies(second_outliers)
+    second_outliers_encoded.fillna(second_outliers_encoded.mean(), inplace=True)
+
+    for column in second_outliers_encoded.columns:
+        if np.isinf(second_outliers_encoded[column]).any():
+            max_val = second_outliers_encoded[~np.isinf(second_outliers_encoded[column])][column].max()
+            second_outliers_encoded[column] = second_outliers_encoded[column].replace([np.inf, -np.inf], max_val)
+
+    # Now, 'second_outliers_encoded' is your DataFrame with encoded categorical variables
+    X = second_outliers_encoded.drop(['price'], axis=1)
+    y = second_outliers_encoded['price']
+
+    # Initialize the ModelSelection class with the data
+    ms = ModelSelection(X, y)
+
+    # Perform model selection
+    ms.select_model()
