@@ -10,7 +10,7 @@ from sklearn.linear_model import LinearRegression, Ridge
 from sklearn.tree import DecisionTreeRegressor
 from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
 from sklearn.svm import SVR
-from sklearn.model_selection import cross_val_score
+from sklearn.model_selection import cross_val_score, train_test_split
 
 class CleanData:
     '''
@@ -190,6 +190,24 @@ class VisualizeData:
         plt.legend()
         plt.show()
 
+    def plot_model_predictions(self, X_test, y_test, model):
+        '''
+        Plots the model's predictions against the actual values
+        :param X_test: Test data
+        :param y_test: Actual values
+        :param model: Trained model
+        '''
+
+        # Use the model to make predictions on the test data
+        predictions = model.predict(X_test)
+
+        # Plot the model's predictions against the actual values
+        plt.scatter(y_test, predictions)
+        plt.xlabel('Actual Values')
+        plt.ylabel('Predicted Values')
+        plt.title(f'{model.__class__.__name__} Model: Actual vs Predicted Values')
+        plt.show()
+
 class DimensionalityReduction:
     def __init__(self, data, targets):
         """
@@ -331,6 +349,17 @@ class ModelSelection:
 
             # Print the model name and its Mean Squared Error
             print(f'Model: {model.__class__.__name__}, Mean Squared Error: {mse_scores.mean()}')
+
+            X_train, X_test, y_train, y_test = train_test_split(self.X, self.y, test_size=0.2, random_state=42)
+
+            # Fit the model to the training data
+            model.fit(X_train, y_train)
+
+            # Initialize the VisualizeData object
+            vd = VisualizeData()
+
+            # Plot the model's predictions
+            vd.plot_model_predictions(X_test, y_test, model)
 
 if __name__ == '__main__':
     # Initialize CleanData object
