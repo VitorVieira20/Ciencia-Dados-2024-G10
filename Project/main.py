@@ -2,6 +2,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib
 import numpy as np
+import seaborn as sns
 from sklearn.preprocessing import StandardScaler
 from scipy.stats import ttest_ind, f_oneway, ttest_rel
 from sklearn.decomposition import PCA
@@ -42,7 +43,7 @@ class CleanData:
 
         # In the column siz there are two types of size
         # BHK and Bedroom, so were going to add a column with those data simplified
-        df_drop_null['bedroom'] = df_drop_null['size'].apply(lambda x: int(x.split(' ')[0]))
+        df_drop_null['rooms'] = df_drop_null['size'].apply(lambda x: int(x.split(' ')[0]))
 
         # Drop size column because we have now the bedroom column
         df_drop_size = df_drop_null.drop(['size'], axis='columns')
@@ -84,7 +85,7 @@ class CleanData:
         Many business managers will tell you that average sqft per bedroom is 300
         With this, we will remove some outliers
         '''
-        df_remove_first_outliers = df_filtered[~(df_filtered.total_sqft / df_filtered.bedroom < 300)]
+        df_remove_first_outliers = df_filtered[~(df_filtered.total_sqft / df_filtered.rooms < 300)]
 
         # Return the cleaned DataFrame
         return df_remove_first_outliers
@@ -154,19 +155,20 @@ class RemoveOutliers:
         '''
         exclude_indices = np.array([])
         for location, location_df in df.groupby('location'):
-            bedroom_stats = {}
-            for bedroom, bedroom_df in location_df.groupby('bedroom'):
-                bedroom_stats[bedroom] = {
-                    'mean': np.mean(bedroom_df.price_per_sqft),
-                    'std': np.std(bedroom_df.price_per_sqft),
-                    'count': bedroom_df.shape[0]
+            room_stats = {}
+            for room, room_df in location_df.groupby('rooms'):
+                room_stats[room] = {
+                    'mean': np.mean(room_df.price_per_sqft),
+                    'std': np.std(room_df.price_per_sqft),
+                    'count': room_df.shape[0]
                 }
-            for bedroom, bedroom_df in location_df.groupby('bedroom'):
-                stats = bedroom_stats.get(bedroom - 1)
+            for room, room_df in location_df.groupby('rooms'):
+                stats = room_stats.get(room - 1)
                 if stats and stats['count'] > 5:
                     exclude_indices = np.append(exclude_indices,
-                                                bedroom_df[bedroom_df.price_per_sqft < (stats['mean'])].index.values)
+                                                room_df[room_df.price_per_sqft < (stats['mean'])].index.values)
         return df.drop(exclude_indices, axis='index')
+
 
 class VisualizeData:
     '''
@@ -179,33 +181,61 @@ class VisualizeData:
         :param df: DataFrame containing all the data
         :param location: Specific location in the DataFrame
         '''
-        bed2 = df[(df['location'] == location) & (df['bedroom'] == 2)]
-        bed3 = df[(df['location'] == location) & (df['bedroom'] == 3)]
+        room2 = df[(df['location'] == location) & (df['rooms'] == 2)]
+        room3 = df[(df['location'] == location) & (df['rooms'] == 3)]
         matplotlib.rcParams['figure.figsize'] = (15, 10)
-        plt.scatter(bed2['total_sqft'], bed2['price'], color='blue', label='2 Bedroom', s=50)
-        plt.scatter(bed3['total_sqft'], bed3['price'], marker='p', color='red', label='3 Bedroom', s=50)
+        plt.scatter(room2['total_sqft'], room2['price'], color='blue', label='2 Rooms', s=50)
+        plt.scatter(room3['total_sqft'], room3['price'], marker='p', color='red', label='3 Rooms', s=50)
         plt.xlabel("Total Square Feet Area")
         plt.ylabel("Price (Lakh Indian Rupees)")
         plt.title(location)
         plt.legend()
         plt.show()
 
-    def plot_model_predictions(self, X_test, y_test, model):
+    def plot_boxplot(self, df, location):
         '''
-        Plots the model's predictions against the actual values
-        :param X_test: Test data
-        :param y_test: Actual values
-        :param model: Trained model
+        Shows the boxplot of a certain location based on their 2 and 3 bedrooms data
+        :param df: DataFrame containing all the data
+        :param location: Specific location in the DataFrame
         '''
+        room2 = df[(df['location'] == location) & (df['rooms'] == 2)]
+        room3 = df[(df['location'] == location) & (df['rooms'] == 3)]
+        plt.figure(figsize=(15, 10))
+        sns.boxplot(x='rooms', y='price', data=pd.concat([room2, room3]), hue='rooms')
+        plt.xlabel("Number of Rooms")
+        plt.ylabel("Price (Lakh Indian Rupees)")
+        plt.title(f'Boxplot for {location}')
+        plt.legend(title='Number of Rooms')
+        plt.show()
 
-        # Use the model to make predictions on the test data
-        predictions = model.predict(X_test)
+    def plot_violinplot(self, df, location):
+        '''
+        Shows the violinplot of a certain location based on their 2 and 3 bedrooms data
+        :param df: DataFrame containing all the data
+        :param location: Specific location in the DataFrame
+        '''
+        room2 = df[(df['location'] == location) & (df['rooms'] == 2)]
+        room3 = df[(df['location'] == location) & (df['rooms'] == 3)]
+        plt.figure(figsize=(15, 10))
+        sns.violinplot(x='rooms', y='price', data=pd.concat([room2, room3]), hue='rooms')
+        plt.xlabel("Number of Rooms")
+        plt.ylabel("Price (Lakh Indian Rupees)")
+        plt.title(f'Violinplot for {location}')
+        plt.legend(title='Number of Rooms')
+        plt.show()
 
-        # Plot the model's predictions against the actual values
-        plt.scatter(y_test, predictions)
-        plt.xlabel('Actual Values')
-        plt.ylabel('Predicted Values')
-        plt.title(f'{model.__class__.__name__} Model: Actual vs Predicted Values')
+    def plot_histogram(self, df, column, location):
+        '''
+        Shows the histogram of a certain column in the DataFrame for a specific location
+        :param df: DataFrame containing all the data
+        :param column: Specific column in the DataFrame
+        :param location: Specific location in the DataFrame
+        '''
+        plt.figure(figsize=(8, 6))
+        sns.histplot(df[df['location'] == location][column], kde=True)
+        plt.xlabel(column)
+        plt.ylabel("Frequency")
+        plt.title(f'Histogram of {column} in {location}')
         plt.show()
 
 class DimensionalityReduction:
@@ -374,23 +404,73 @@ if __name__ == '__main__':
     # Initialize the VisualizeData object
     vd = VisualizeData()
 
+    # Show data before outliers in scatter chart
+    #vd.plot_scatter_chart(cleaned_data, "Rajaji Nagar")
+    #vd.plot_scatter_chart(cleaned_data, "Hebbal")
+    #vd.plot_scatter_chart(cleaned_data, "Yeshwanthpur")
+
+    # Show data before outliers in box plots
+    #vd.plot_boxplot(cleaned_data, "Rajaji Nagar")
+    #vd.plot_boxplot(cleaned_data, "Hebbal")
+    #vd.plot_boxplot(cleaned_data, "Yeshwanthpur")
+
+    # Show data before outliers in violins plot
+    #vd.plot_violinplot(cleaned_data, "Rajaji Nagar")
+    #vd.plot_violinplot(cleaned_data, "Hebbal")
+    #vd.plot_violinplot(cleaned_data, "Yeshwanthpur")
+
+    # Show data before outliers in histograms
+    #vd.plot_histogram(cleaned_data, "price_per_sqft", "Rajaji Nagar")
+    #vd.plot_histogram(cleaned_data, "price_per_sqft", "Hebbal")
+    #vd.plot_histogram(cleaned_data, "price_per_sqft", "Yeshwanthpur")
+
     # Removes first demand of outliers
     first_outliers = rm.remove_prices_outliers(cleaned_data)
 
     # See the scatter plots before the second removal
-    vd.plot_scatter_chart(first_outliers, "Rajaji Nagar")
-    vd.plot_scatter_chart(first_outliers, "Hebbal")
-    vd.plot_scatter_chart(first_outliers, "Yeshwanthpur")
+    #vd.plot_scatter_chart(first_outliers, "Rajaji Nagar")
+    #vd.plot_scatter_chart(first_outliers, "Hebbal")
+    #vd.plot_scatter_chart(first_outliers, "Yeshwanthpur")
+
+    # Show data before the second removal in box plots
+    #vd.plot_boxplot(first_outliers, "Rajaji Nagar")
+    #vd.plot_boxplot(first_outliers, "Hebbal")
+    #vd.plot_boxplot(first_outliers, "Yeshwanthpur")
+
+    # Show data before the second removals in violins plot
+    #vd.plot_violinplot(first_outliers, "Rajaji Nagar")
+    #vd.plot_violinplot(first_outliers, "Hebbal")
+    #vd.plot_violinplot(first_outliers, "Yeshwanthpur")
+
+    # Show data before the second removal in histograms
+    #vd.plot_histogram(first_outliers, "price_per_sqft", "Rajaji Nagar")
+    #vd.plot_histogram(first_outliers, "price_per_sqft", "Hebbal")
+    #vd.plot_histogram(first_outliers, "price_per_sqft", "Yeshwanthpur")
 
     # Removes second demand of outliers
     second_outliers = rm.remove_bedroom_outliers(first_outliers)
 
     # See the scatter plots after the second removal
-    vd.plot_scatter_chart(second_outliers, "Rajaji Nagar")
-    vd.plot_scatter_chart(second_outliers, "Hebbal")
-    vd.plot_scatter_chart(second_outliers, "Yeshwanthpur")
+    #vd.plot_scatter_chart(second_outliers, "Rajaji Nagar")
+    #vd.plot_scatter_chart(second_outliers, "Hebbal")
+    #vd.plot_scatter_chart(second_outliers, "Yeshwanthpur")
 
-    data = second_outliers[['total_sqft', 'bath', 'balcony', 'bedroom', 'price_per_sqft']]
+    # Show data after the second removal in box plots
+    #vd.plot_boxplot(second_outliers, "Rajaji Nagar")
+    #vd.plot_boxplot(second_outliers, "Hebbal")
+    #vd.plot_boxplot(second_outliers, "Yeshwanthpur")
+
+    # Show data after the second removal in violins plot
+    vd.plot_violinplot(second_outliers, "Rajaji Nagar")
+    vd.plot_violinplot(second_outliers, "Hebbal")
+    vd.plot_violinplot(second_outliers, "Yeshwanthpur")
+
+    # Show data after the second removal in histograms
+    vd.plot_histogram(second_outliers, "price_per_sqft", "Rajaji Nagar")
+    vd.plot_histogram(second_outliers, "price_per_sqft", "Hebbal")
+    vd.plot_histogram(second_outliers, "price_per_sqft", "Yeshwanthpur")
+
+    data = second_outliers[['total_sqft', 'bath', 'balcony', 'rooms', 'price_per_sqft']]
     targets = second_outliers['price']
 
     # Initialize DimensionalityReduction object
@@ -434,16 +514,16 @@ if __name__ == '__main__':
     # 10 new features
 
     # Price distribution per bedroom.
-    second_outliers['price_per_bedroom'] = second_outliers['price'] / second_outliers['bedroom']
+    second_outliers['price_per_bedroom'] = second_outliers['price'] / second_outliers['rooms']
 
     # Bathroom to bedroom ratio.
-    second_outliers['bath_per_bedroom'] = second_outliers['bath'] / second_outliers['bedroom']
+    second_outliers['bath_per_bedroom'] = second_outliers['bath'] / second_outliers['rooms']
 
     # Space distribution per bedroom.
-    second_outliers['total_sqft_per_bedroom'] = second_outliers['total_sqft'] / second_outliers['bedroom']
+    second_outliers['total_sqft_per_room'] = second_outliers['total_sqft'] / second_outliers['rooms']
 
     # Balcony to bedroom ratio
-    second_outliers['balcony_per_bedroom'] = second_outliers['balcony'] / second_outliers['bedroom']
+    second_outliers['balcony_per_room'] = second_outliers['balcony'] / second_outliers['rooms']
 
     # Price distribution per bathroom
     second_outliers['price_per_bath'] = second_outliers['price'] / second_outliers['bath']
@@ -461,7 +541,7 @@ if __name__ == '__main__':
     second_outliers['total_sqft_per_balcony'] = second_outliers['total_sqft'] / second_outliers['balcony']
 
     # Bedroom to bathroom ratio
-    second_outliers['bedroom_per_bath'] = second_outliers['bedroom'] / second_outliers['bath']
+    second_outliers['room_per_bath'] = second_outliers['rooms'] / second_outliers['bath']
 
     # Model selection
     second_outliers_encoded = pd.get_dummies(second_outliers)
