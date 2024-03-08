@@ -238,6 +238,19 @@ class VisualizeData:
         plt.title(f'Histogram of {column} in {location}')
         plt.show()
 
+    def plot_heatmap(self, df):
+        '''
+        Shows the heatmap of correlation between columns in the DataFrame
+        :param df: DataFrame containing all the data
+        '''
+        if 'location' in df.columns:
+            df = df.drop(columns=['location'])
+
+        plt.figure(figsize=(10, 8))
+        sns.heatmap(df.corr(), annot=True, cmap='coolwarm', fmt=".2f")
+        plt.title("Correlation Heatmap")
+        plt.show()
+
 class DimensionalityReduction:
     def __init__(self, data, targets):
         """
@@ -424,6 +437,9 @@ if __name__ == '__main__':
     vd.plot_histogram(cleaned_data, "price_per_sqft", "Hebbal")
     vd.plot_histogram(cleaned_data, "price_per_sqft", "Yeshwanthpur")
 
+    # Show heatmap with correlations
+    vd.plot_heatmap(cleaned_data)
+
     # Removes first demand of outliers
     first_outliers = rm.remove_prices_outliers(cleaned_data)
 
@@ -447,6 +463,9 @@ if __name__ == '__main__':
     vd.plot_histogram(first_outliers, "price_per_sqft", "Hebbal")
     vd.plot_histogram(first_outliers, "price_per_sqft", "Yeshwanthpur")
 
+    # Show heatmap with correlations
+    vd.plot_heatmap(first_outliers)
+
     # Removes second demand of outliers
     second_outliers = rm.remove_bedroom_outliers(first_outliers)
 
@@ -469,6 +488,9 @@ if __name__ == '__main__':
     vd.plot_histogram(second_outliers, "price_per_sqft", "Rajaji Nagar")
     vd.plot_histogram(second_outliers, "price_per_sqft", "Hebbal")
     vd.plot_histogram(second_outliers, "price_per_sqft", "Yeshwanthpur")
+
+    # Show heatmap with correlations
+    vd.plot_heatmap(second_outliers)
 
     data = second_outliers[['total_sqft', 'bath', 'balcony', 'rooms', 'price_per_sqft']]
     targets = second_outliers['price']
