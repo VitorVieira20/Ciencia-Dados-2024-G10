@@ -405,60 +405,60 @@ if __name__ == '__main__':
     vd = VisualizeData()
 
     # Show data before outliers in scatter chart
-    #vd.plot_scatter_chart(cleaned_data, "Rajaji Nagar")
-    #vd.plot_scatter_chart(cleaned_data, "Hebbal")
-    #vd.plot_scatter_chart(cleaned_data, "Yeshwanthpur")
+    vd.plot_scatter_chart(cleaned_data, "Rajaji Nagar")
+    vd.plot_scatter_chart(cleaned_data, "Hebbal")
+    vd.plot_scatter_chart(cleaned_data, "Yeshwanthpur")
 
     # Show data before outliers in box plots
-    #vd.plot_boxplot(cleaned_data, "Rajaji Nagar")
-    #vd.plot_boxplot(cleaned_data, "Hebbal")
-    #vd.plot_boxplot(cleaned_data, "Yeshwanthpur")
+    vd.plot_boxplot(cleaned_data, "Rajaji Nagar")
+    vd.plot_boxplot(cleaned_data, "Hebbal")
+    vd.plot_boxplot(cleaned_data, "Yeshwanthpur")
 
     # Show data before outliers in violins plot
-    #vd.plot_violinplot(cleaned_data, "Rajaji Nagar")
-    #vd.plot_violinplot(cleaned_data, "Hebbal")
-    #vd.plot_violinplot(cleaned_data, "Yeshwanthpur")
+    vd.plot_violinplot(cleaned_data, "Rajaji Nagar")
+    vd.plot_violinplot(cleaned_data, "Hebbal")
+    vd.plot_violinplot(cleaned_data, "Yeshwanthpur")
 
     # Show data before outliers in histograms
-    #vd.plot_histogram(cleaned_data, "price_per_sqft", "Rajaji Nagar")
-    #vd.plot_histogram(cleaned_data, "price_per_sqft", "Hebbal")
-    #vd.plot_histogram(cleaned_data, "price_per_sqft", "Yeshwanthpur")
+    vd.plot_histogram(cleaned_data, "price_per_sqft", "Rajaji Nagar")
+    vd.plot_histogram(cleaned_data, "price_per_sqft", "Hebbal")
+    vd.plot_histogram(cleaned_data, "price_per_sqft", "Yeshwanthpur")
 
     # Removes first demand of outliers
     first_outliers = rm.remove_prices_outliers(cleaned_data)
 
     # See the scatter plots before the second removal
-    #vd.plot_scatter_chart(first_outliers, "Rajaji Nagar")
-    #vd.plot_scatter_chart(first_outliers, "Hebbal")
-    #vd.plot_scatter_chart(first_outliers, "Yeshwanthpur")
+    vd.plot_scatter_chart(first_outliers, "Rajaji Nagar")
+    vd.plot_scatter_chart(first_outliers, "Hebbal")
+    vd.plot_scatter_chart(first_outliers, "Yeshwanthpur")
 
     # Show data before the second removal in box plots
-    #vd.plot_boxplot(first_outliers, "Rajaji Nagar")
-    #vd.plot_boxplot(first_outliers, "Hebbal")
-    #vd.plot_boxplot(first_outliers, "Yeshwanthpur")
+    vd.plot_boxplot(first_outliers, "Rajaji Nagar")
+    vd.plot_boxplot(first_outliers, "Hebbal")
+    vd.plot_boxplot(first_outliers, "Yeshwanthpur")
 
     # Show data before the second removals in violins plot
-    #vd.plot_violinplot(first_outliers, "Rajaji Nagar")
-    #vd.plot_violinplot(first_outliers, "Hebbal")
-    #vd.plot_violinplot(first_outliers, "Yeshwanthpur")
+    vd.plot_violinplot(first_outliers, "Rajaji Nagar")
+    vd.plot_violinplot(first_outliers, "Hebbal")
+    vd.plot_violinplot(first_outliers, "Yeshwanthpur")
 
     # Show data before the second removal in histograms
-    #vd.plot_histogram(first_outliers, "price_per_sqft", "Rajaji Nagar")
-    #vd.plot_histogram(first_outliers, "price_per_sqft", "Hebbal")
-    #vd.plot_histogram(first_outliers, "price_per_sqft", "Yeshwanthpur")
+    vd.plot_histogram(first_outliers, "price_per_sqft", "Rajaji Nagar")
+    vd.plot_histogram(first_outliers, "price_per_sqft", "Hebbal")
+    vd.plot_histogram(first_outliers, "price_per_sqft", "Yeshwanthpur")
 
     # Removes second demand of outliers
     second_outliers = rm.remove_bedroom_outliers(first_outliers)
 
     # See the scatter plots after the second removal
-    #vd.plot_scatter_chart(second_outliers, "Rajaji Nagar")
-    #vd.plot_scatter_chart(second_outliers, "Hebbal")
-    #vd.plot_scatter_chart(second_outliers, "Yeshwanthpur")
+    vd.plot_scatter_chart(second_outliers, "Rajaji Nagar")
+    vd.plot_scatter_chart(second_outliers, "Hebbal")
+    vd.plot_scatter_chart(second_outliers, "Yeshwanthpur")
 
     # Show data after the second removal in box plots
-    #vd.plot_boxplot(second_outliers, "Rajaji Nagar")
-    #vd.plot_boxplot(second_outliers, "Hebbal")
-    #vd.plot_boxplot(second_outliers, "Yeshwanthpur")
+    vd.plot_boxplot(second_outliers, "Rajaji Nagar")
+    vd.plot_boxplot(second_outliers, "Hebbal")
+    vd.plot_boxplot(second_outliers, "Yeshwanthpur")
 
     # Show data after the second removal in violins plot
     vd.plot_violinplot(second_outliers, "Rajaji Nagar")
