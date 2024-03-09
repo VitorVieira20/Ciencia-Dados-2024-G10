@@ -43,6 +43,7 @@ class CleanData:
 
         # In the column siz there are two types of size
         # BHK and Bedroom, so were going to add a column with those data simplified
+        df_drop_null = df_drop_null.copy()
         df_drop_null['rooms'] = df_drop_null['size'].apply(lambda x: int(x.split(' ')[0]))
 
         # Drop size column because we have now the bedroom column
@@ -79,6 +80,7 @@ class CleanData:
         # Filter DataFrame with valid locations
         df_filtered = df_conv_val_cleaned_sorted[df_conv_val_cleaned_sorted['location'].isin(valid_locations)]
 
+        df_filtered = df_filtered.copy()
         df_filtered['price_per_sqft'] = df_filtered['price'] / df_filtered['total_sqft']
 
         '''
@@ -380,7 +382,7 @@ class ModelSelection:
         Gradient Boosting Regression, and Support Vector Regression.
         """
         # Create a list of models to evaluate
-        models = [LinearRegression(), DecisionTreeRegressor(), RandomForestRegressor(), GradientBoostingRegressor(),
+        models = [RandomForestRegressor(), GradientBoostingRegressor(), LinearRegression(), DecisionTreeRegressor(),
                   SVR(), Ridge()]
 
         for model in models:
@@ -398,11 +400,32 @@ class ModelSelection:
             # Fit the model to the training data
             model.fit(X_train, y_train)
 
-            # Initialize the VisualizeData object
-            vd = VisualizeData()
-
             # Plot the model's predictions
-            vd.plot_model_predictions(X_test, y_test, model)
+            self.plot_model_predictions(X_test, y_test, model)
+
+    def plot_model_predictions(self, X_test, y_test, model):
+        '''
+        Plots the model's predictions against the actual values
+        :param X_test: Test data
+        :param y_test: Actual values
+        :param model: Trained model
+        '''
+
+        # Use the model to make predictions on the test data
+        predictions = model.predict(X_test)
+
+        # Plot the model's predictions against the actual values
+        plt.scatter(y_test, predictions)
+        plt.xlabel('Actual Values')
+        plt.ylabel('Predicted Values')
+        plt.title(f'{model.__class__.__name__} Model: Actual vs Predicted Values')
+
+        # Add a line representing perfect prediction
+        min_val = min(min(y_test), min(predictions))
+        max_vals = max(max(y_test), max(predictions))
+        plt.plot([min_val, max_vals], [min_val, max_vals], color='red')
+
+        plt.show()
 
 if __name__ == '__main__':
     # Initialize CleanData object
@@ -564,6 +587,12 @@ if __name__ == '__main__':
 
     # Bedroom to bathroom ratio
     second_outliers['room_per_bath'] = second_outliers['rooms'] / second_outliers['bath']
+
+    # Calculate the average price
+    average_price = second_outliers['price'].mean()
+
+    # Prices above average
+    second_outliers['price_above_average'] = second_outliers['price'] > average_price
 
     # Model selection
     second_outliers_encoded = pd.get_dummies(second_outliers)
