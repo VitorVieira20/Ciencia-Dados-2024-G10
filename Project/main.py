@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+import time
 
 # Classes
 from Project.Classes.data_loader import DataLoader
@@ -63,16 +64,20 @@ print_shape(remove_outliers, "Remove remaining outliers")
 #####################################################################
 
 # Show data from Remove outliers based on price per square feat
-#plot_data_visualizations(remove_price_by_square_feat.data_train, ['Electronic City', 'Raja Rajeshwari Nagar', 'Sarjapur  Road'])
+plot_data_visualizations(remove_price_by_square_feat.data_train, ['Electronic City', 'Raja Rajeshwari Nagar', 'Sarjapur  Road'])
+time.sleep(40)
 
 # Show data from Remove outliers based on price and location
-#plot_data_visualizations(remove_price_location.data_train, ['Electronic City', 'Raja Rajeshwari Nagar', 'Sarjapur  Road'])
+plot_data_visualizations(remove_price_location.data_train, ['Electronic City', 'Raja Rajeshwari Nagar', 'Sarjapur  Road'])
+time.sleep(40)
 
 # Show data from Remove outliers based on bedrooms and total square feat
-#plot_data_visualizations(remove_bedroom.data_train, ['Electronic City', 'Raja Rajeshwari Nagar', 'Sarjapur  Road'])
+plot_data_visualizations(remove_bedroom.data_train, ['Electronic City', 'Raja Rajeshwari Nagar', 'Sarjapur  Road'])
+time.sleep(40)
 
 # Show data from Remove Remaining outliers
-#plot_data_visualizations(remove_outliers.data_train, ['Electronic City', 'Raja Rajeshwari Nagar', 'Sarjapur  Road'])
+plot_data_visualizations(remove_outliers.data_train, ['Electronic City', 'Raja Rajeshwari Nagar', 'Sarjapur  Road'])
+time.sleep(40)
 
 
 
@@ -90,10 +95,10 @@ targets = remove_outliers.labels_train
 dr = DimensionalityReduction(data, targets)
 
 # Show PCA Projection
-#dr.plot_projection(dr.compute_pca(), 'PCA Projection')
+dr.plot_projection(dr.compute_pca(), 'PCA Projection')
 
 # Show UMAP Projection
-#dr.plot_projection(dr.compute_umap(), 'UMAP Projection')
+dr.plot_projection(dr.compute_umap(), 'UMAP Projection')
 
 
 
@@ -117,16 +122,16 @@ total_sqft_Raja_Nagar = data[data['location'] == 'Raja Rajeshwari Nagar']['total
 tester = HypothesisTester()
 
 # Perform unpaired t-test between Electronic City and Raja Rajeshwari Nagar locations
-#t_stat, p_val = tester.unpaired_t_test(price_Electronic_City, price_sqft_Raja_Nagar)
-#print_hypothesis_result("Unpaired t-test between Electronic City and Raja Rajeshwari Nagar locations:", "t-statistic", t_stat, "p-value", p_val)
+t_stat, p_val = tester.unpaired_t_test(price_Electronic_City, price_sqft_Raja_Nagar)
+print_hypothesis_result("Unpaired t-test between Electronic City and Raja Rajeshwari Nagar locations:", "t-statistic", t_stat, "p-value", p_val)
 
 # Perform unpaired ANOVA among the three locations
-#f_stat, p_val_anova = tester.unpaired_anova(price_sqft_Raja_Nagar, price_sqft_Electronic_City, price_sqft_Sarjapur_Road)
-#print_hypothesis_result("Unpaired ANOVA among three locations:", "F-statistic", f_stat, "p-value", p_val_anova)
+f_stat, p_val_anova = tester.unpaired_anova(price_sqft_Raja_Nagar, price_sqft_Electronic_City, price_sqft_Sarjapur_Road)
+print_hypothesis_result("Unpaired ANOVA among three locations:", "F-statistic", f_stat, "p-value", p_val_anova)
 
 # Perform paired t-test for total_sqft and price within Raja Rajeshwari Nagar location
-#t_stat_paired, p_val_paired = tester.paired_t_test(total_sqft_Raja_Nagar, price_sqft_Raja_Nagar)
-#print_hypothesis_result("Paired t-test for total_sqft and price within Raja Rajeshwari location:", "t-statistic", t_stat_paired, "p-value", p_val_paired)
+t_stat_paired, p_val_paired = tester.paired_t_test(total_sqft_Raja_Nagar, price_sqft_Raja_Nagar)
+print_hypothesis_result("Paired t-test for total_sqft and price within Raja Rajeshwari location:", "t-statistic", t_stat_paired, "p-value", p_val_paired)
 
 
 
@@ -135,9 +140,9 @@ tester = HypothesisTester()
 #####################################################################
 
 # Create new features based on feature engineering
-newFeatures = FeatureEngineering(remove_outliers)
-newFeatures.create_features()
-print_shape(newFeatures, "Data with new features")
+new_features = FeatureEngineering(remove_outliers)
+new_features.create_features()
+print_shape(new_features, "Data with new features")
 
 
 
@@ -145,7 +150,7 @@ print_shape(newFeatures, "Data with new features")
 #                         MODEL SELECTION                           #
 #####################################################################
 
-new_features_encoded = pd.get_dummies(newFeatures.data_train)
+new_features_encoded = pd.get_dummies(new_features.data_train)
 new_features_encoded.fillna(new_features_encoded.mean(), inplace=True)
 
 for column in new_features_encoded.columns:
