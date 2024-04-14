@@ -5,9 +5,10 @@ import numpy as np
 from Project.Classes.data_loader import DataLoader
 from Project.Classes.clean_data import CleanData
 from Project.Classes.filter_locations import FilterLocations
-from Project.Classes.price_sqft_outliers import RemovePriceBySquareFeatOutliers
-from Project.Classes.price_location_outliers import RemovePriceLocationsOutliers
-from Project.Classes.bedrooms_outliers import RemoveBedroomsOutliers
+from Project.Classes.Outliers.price_sqft_outliers import RemovePriceBySquareFeatOutliers
+from Project.Classes.Outliers.price_location_outliers import RemovePriceLocationsOutliers
+from Project.Classes.Outliers.bedrooms_outliers import RemoveBedroomsOutliers
+from Project.Classes.Outliers.remove_remaining_outliers import RemoveRemainingOutliers
 from Project.Classes.dimensionality_reduction import DimensionalityReduction
 from Project.Classes.hypothesis_tester import HypothesisTester
 from Project.Classes.feature_engineering import FeatureEngineering
@@ -36,19 +37,24 @@ filter_locations.clean_data()
 print_shape(filter_locations, "Clean Data by Locations")
 
 # Remove outliers based on price per square feat
-removePriceBySquareFeat = RemovePriceBySquareFeatOutliers(filter_locations)
-removePriceBySquareFeat.clean_data()
-print_shape(removePriceBySquareFeat, "Remove outliers based on Price by Square Feat")
+remove_price_by_square_feat = RemovePriceBySquareFeatOutliers(filter_locations)
+remove_price_by_square_feat.clean_data()
+print_shape(remove_price_by_square_feat, "Remove outliers based on Price by Square Feat")
 
 # Remove outliers based on price and location
-removePriceLocation = RemovePriceLocationsOutliers(removePriceBySquareFeat)
-removePriceLocation.clean_data()
-print_shape(removePriceLocation, "Remove outliers based on Price and Locations")
+remove_price_location = RemovePriceLocationsOutliers(remove_price_by_square_feat)
+remove_price_location.clean_data()
+print_shape(remove_price_location, "Remove outliers based on Price and Locations")
 
 # Remove outliers based on bedrooms and total square feat
-removeBedroom = RemoveBedroomsOutliers(removePriceLocation)
-removeBedroom.clean_data()
-print_shape(removeBedroom, "Remove outliers based on Bedrooms and Total Square Feat")
+remove_bedroom = RemoveBedroomsOutliers(remove_price_location)
+remove_bedroom.clean_data()
+print_shape(remove_bedroom, "Remove outliers based on Bedrooms and Total Square Feat")
+
+# Remove remaining outliers
+remove_outliers = RemoveRemainingOutliers(remove_bedroom)
+remove_outliers.remove_outliers()
+print_shape(remove_outliers, "Remove remaining outliers")
 
 
 
@@ -57,13 +63,16 @@ print_shape(removeBedroom, "Remove outliers based on Bedrooms and Total Square F
 #####################################################################
 
 # Show data from Remove outliers based on price per square feat
-plot_data_visualizations(removePriceBySquareFeat.data_train, ["Rajaji Nagar", "Hebbal", "Yeshwanthpur"])
+#plot_data_visualizations(remove_price_by_square_feat.data_train, ['Electronic City', 'Raja Rajeshwari Nagar', 'Sarjapur  Road'])
 
 # Show data from Remove outliers based on price and location
-plot_data_visualizations(removePriceLocation.data_train, ["Rajaji Nagar", "Hebbal", "Yeshwanthpur"])
+#plot_data_visualizations(remove_price_location.data_train, ['Electronic City', 'Raja Rajeshwari Nagar', 'Sarjapur  Road'])
 
 # Show data from Remove outliers based on bedrooms and total square feat
-plot_data_visualizations(removeBedroom.data_train, ["Rajaji Nagar", "Hebbal", "Yeshwanthpur"])
+#plot_data_visualizations(remove_bedroom.data_train, ['Electronic City', 'Raja Rajeshwari Nagar', 'Sarjapur  Road'])
+
+# Show data from Remove Remaining outliers
+#plot_data_visualizations(remove_outliers.data_train, ['Electronic City', 'Raja Rajeshwari Nagar', 'Sarjapur  Road'])
 
 
 
@@ -72,19 +81,19 @@ plot_data_visualizations(removeBedroom.data_train, ["Rajaji Nagar", "Hebbal", "Y
 #####################################################################
 
 # Our data
-data = removeBedroom.data_train.drop(columns=["price", "location"])
+data = remove_outliers.data_train.drop(columns=["price", "location"])
 
 # Our target
-targets = removeBedroom.labels_train
+targets = remove_outliers.labels_train
 
 # Initialize DimensionalityReduction object
 dr = DimensionalityReduction(data, targets)
 
 # Show PCA Projection
-dr.plot_projection(dr.compute_pca(), 'PCA Projection')
+#dr.plot_projection(dr.compute_pca(), 'PCA Projection')
 
 # Show UMAP Projection
-dr.plot_projection(dr.compute_umap(), 'UMAP Projection')
+#dr.plot_projection(dr.compute_umap(), 'UMAP Projection')
 
 
 
@@ -93,31 +102,31 @@ dr.plot_projection(dr.compute_umap(), 'UMAP Projection')
 #####################################################################
 
 # Prices per SQq. feet for three locations
-data = removeBedroom.data_train
+data = remove_outliers.data_train
 
-price_sqft_Rajaji_Nagar = data[data['location'] == 'Rajaji Nagar']['price_per_sqft']
-price_sqft_Hebbal = data[data['location'] == 'Hebbal']['price_per_sqft']
-price_sqft_Yeshwanthpur = data[data['location'] == 'Yeshwanthpur']['price_per_sqft']
+price_sqft_Electronic_City = data[data['location'] == 'Electronic City']['price_per_sqft']
+price_sqft_Raja_Nagar = data[data['location'] == 'Raja Rajeshwari Nagar']['price_per_sqft']
+price_sqft_Sarjapur_Road = data[data['location'] == 'Sarjapur  Road']['price_per_sqft']
 
 # Prices for Rajaji Nagar location
-price_Rajaji_Nagar = data[data['location'] == 'Rajaji Nagar']['price']
+price_Electronic_City = data[data['location'] == 'Electronic City']['price']
 
 # Total Sq. Feet for Rajaji Nagar location
-total_sqft_Rajaji_Nagar = data[data['location'] == 'Rajaji Nagar']['total_sqft']
+total_sqft_Raja_Nagar = data[data['location'] == 'Raja Rajeshwari Nagar']['total_sqft']
 
 tester = HypothesisTester()
 
-# Perform unpaired t-test between Hebbal and Rajaji Nagar locations
-t_stat, p_val = tester.unpaired_t_test(price_sqft_Hebbal, price_sqft_Rajaji_Nagar)
-print_hypothesis_result("Unpaired t-test between Hebbal and Rajaji Nagar locations:", "t-statistic", t_stat, "p-value", p_val)
+# Perform unpaired t-test between Electronic City and Raja Rajeshwari Nagar locations
+#t_stat, p_val = tester.unpaired_t_test(price_Electronic_City, price_sqft_Raja_Nagar)
+#print_hypothesis_result("Unpaired t-test between Electronic City and Raja Rajeshwari Nagar locations:", "t-statistic", t_stat, "p-value", p_val)
 
 # Perform unpaired ANOVA among the three locations
-f_stat, p_val_anova = tester.unpaired_anova(price_sqft_Rajaji_Nagar, price_sqft_Hebbal, price_sqft_Yeshwanthpur)
-print_hypothesis_result("Unpaired ANOVA among three locations:", "F-statistic", f_stat, "p-value", p_val_anova)
+#f_stat, p_val_anova = tester.unpaired_anova(price_sqft_Raja_Nagar, price_sqft_Electronic_City, price_sqft_Sarjapur_Road)
+#print_hypothesis_result("Unpaired ANOVA among three locations:", "F-statistic", f_stat, "p-value", p_val_anova)
 
-# Perform paired t-test for total_sqft and price within Rajaji Nagar location
-t_stat_paired, p_val_paired = tester.paired_t_test(total_sqft_Rajaji_Nagar, price_Rajaji_Nagar)
-print_hypothesis_result("Paired t-test for total_sqft and price within Rajaji Nagar location:", "t-statistic", t_stat_paired, "p-value", p_val_paired)
+# Perform paired t-test for total_sqft and price within Raja Rajeshwari Nagar location
+#t_stat_paired, p_val_paired = tester.paired_t_test(total_sqft_Raja_Nagar, price_sqft_Raja_Nagar)
+#print_hypothesis_result("Paired t-test for total_sqft and price within Raja Rajeshwari location:", "t-statistic", t_stat_paired, "p-value", p_val_paired)
 
 
 
@@ -126,7 +135,7 @@ print_hypothesis_result("Paired t-test for total_sqft and price within Rajaji Na
 #####################################################################
 
 # Create new features based on feature engineering
-newFeatures = FeatureEngineering(removeBedroom)
+newFeatures = FeatureEngineering(remove_outliers)
 newFeatures.create_features()
 print_shape(newFeatures, "Data with new features")
 

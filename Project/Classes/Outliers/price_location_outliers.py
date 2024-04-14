@@ -1,5 +1,6 @@
 import numpy as np
 
+
 class RemovePriceLocationsOutliers:
     """
     A class to remove outliers based on location using mean and one standard deviation
@@ -31,7 +32,6 @@ class RemovePriceLocationsOutliers:
 
         # Apply to labels
         self.labels_train = self.labels_train.loc[self.data_train.index]
-        self.labels_test = self.labels_test.loc[self.data_test.index]
 
     def _remove_prices_outliers(self):
         '''

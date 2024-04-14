@@ -1,5 +1,6 @@
 import pandas as pd
 
+
 class CleanData:
     """
     A class to clean and pre-process the data

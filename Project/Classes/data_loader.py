@@ -1,6 +1,7 @@
 import pandas as pd
 from sklearn.model_selection import cross_val_score, train_test_split
 
+
 class DataLoader:
     """
     Generic Class responsible for loading the dataset and splitting it into training and testing sets.
