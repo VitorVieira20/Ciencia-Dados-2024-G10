@@ -14,11 +14,13 @@ from Project.Classes.dimensionality_reduction import DimensionalityReduction
 from Project.Classes.hypothesis_tester import HypothesisTester
 from Project.Classes.feature_engineering import FeatureEngineering
 from Project.Classes.model_selection import ModelSelection
+from Project.Classes.ModelClasses.KNN import KNN
 
 # Functions
-from Project.Classes.shared_functions import print_shape
-from Project.Classes.shared_functions import plot_data_visualizations
-from Project.Classes.shared_functions import print_hypothesis_result
+from Project.Classes.Shared.shared_functions import print_shape
+from Project.Classes.Shared.shared_functions import plot_data_visualizations
+from Project.Classes.Shared.shared_functions import print_hypothesis_result
+from Project.Classes.Shared.shared_functions import data_for_KNN
 
 #####################################################################
 #                       LOAD AND CLEAN DATA                         #
@@ -167,3 +169,17 @@ ms = ModelSelection(X, y)
 
 # Perform model selection
 ms.select_model()
+
+
+
+#####################################################################
+#                               KNN                                 #
+#####################################################################
+
+KNN_data = new_features
+X_train_KNN, X_test_KNN, y_train_KNN, y_test_KNN = data_for_KNN(KNN_data)
+
+knn = KNN(k=1)
+knn.fit(X_train_KNN, y_train_KNN)
+
+knn.evaluate(X_test_KNN, y_test_KNN)
