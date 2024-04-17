@@ -176,8 +176,8 @@ ms.select_model()
 #                               KNN                                 #
 #####################################################################
 
-data = new_features
-X_train_KNN, X_test_KNN, y_train_KNN, y_test_KNN = data_for_KNN(data)
+KNN_data = new_features
+X_train_KNN, X_test_KNN, y_train_KNN, y_test_KNN = data_for_KNN(KNN_data)
 
 knn = KNN(k=1)
 knn.fit(X_train_KNN, y_train_KNN)
