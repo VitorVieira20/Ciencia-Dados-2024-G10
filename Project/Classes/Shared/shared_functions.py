@@ -1,4 +1,5 @@
 import pandas as pd
+import matplotlib.pyplot as plt
 
 from Project.Classes.visualize_data import VisualizeData
 
@@ -43,12 +44,48 @@ def data_for_KNN(data):
 
     data_test_encoded = data_test_encoded.reindex(columns=data_train_encoded.columns, fill_value=0)
 
-    X_train = pd.concat([data.data_train.drop('location', axis=1), data_train_encoded], axis=1)
+    X_train_dummies = pd.concat([data.data_train.drop('location', axis=1), data_train_encoded], axis=1)
+    X_test_dummies = pd.concat([data.data_test.drop('location', axis=1), data_test_encoded], axis=1)
+
+    X_train = X_train_dummies.drop('price', axis=1)
+    X_test = X_test_dummies.drop('price', axis=1)
     y_train = data.labels_train
-    X_test = pd.concat([data.data_test.drop('location', axis=1), data_test_encoded], axis=1)
     y_test = data.labels_test
 
     X_train.reset_index(drop=True, inplace=True)
     y_train.reset_index(drop=True, inplace=True)
 
     return X_train, X_test, y_train, y_test
+
+def models_predictions_plot(test_labels, model_predictions, model_name):
+    plt.figure(figsize=(10, 6))
+    plt.scatter(test_labels, model_predictions, color='blue', alpha=0.5)
+    plt.plot(test_labels, test_labels, color='red')
+    plt.title(f'Comparação entre Valores Reais e Previsões ({model_name})')
+    plt.xlabel('Valores Reais')
+    plt.ylabel(f'Previsões do {model_name}')
+    plt.grid(True)
+    plt.show()
+
+
+def models_residuals_plot(test_labels, model_predictions, model_name):
+    residuals = test_labels - model_predictions
+    plt.figure(figsize=(10, 6))
+    plt.scatter(model_predictions, residuals, color='green', alpha=0.5)
+    plt.title(f'Residuals vs Predicted Values ({model_name})')
+    plt.xlabel('Predicted Values')
+    plt.ylabel('Residuals')
+    plt.grid(True)
+    plt.axhline(y=0, color='red', linestyle='--')
+    plt.show()
+
+
+def models_training_loss_plot(model, model_name):
+    plt.figure(figsize=(10, 6))
+    plt.plot(model.loss_curve_, label='Training Loss')
+    plt.title(f'Training Loss Curve ({model_name})')
+    plt.xlabel('Epochs')
+    plt.ylabel('Loss')
+    plt.legend()
+    plt.grid(True)
+    plt.show()

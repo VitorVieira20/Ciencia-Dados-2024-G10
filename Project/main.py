@@ -14,7 +14,21 @@ from Project.Classes.dimensionality_reduction import DimensionalityReduction
 from Project.Classes.hypothesis_tester import HypothesisTester
 from Project.Classes.feature_engineering import FeatureEngineering
 from Project.Classes.model_selection import ModelSelection
+
+# Models
 from Project.Classes.ModelClasses.KNN import KNN
+from Project.Classes.ModelClasses.SupervisedLearning.LinearRegression import LinearRegressionModel
+from Project.Classes.ModelClasses.SupervisedLearning.SVM import SVMModel
+from Project.Classes.ModelClasses.SupervisedLearning.MLP import MLPModel
+from Project.Classes.ModelClasses.SupervisedLearning.LassoRegression import LassoRegressionModel
+from Project.Classes.ModelClasses.SupervisedLearning.RidgeRegression import RidgeRegressionModel
+from Project.Classes.ModelClasses.EnsembleModels.GradientBoosting import GradientBoostingModel
+from Project.Classes.ModelClasses.EnsembleModels.RandomForest import RandomForestModel
+from Project.Classes.ModelClasses.DeepLearning.ModelA import ModelA
+from Project.Classes.ModelClasses.DeepLearning.ModelB import ModelB
+from Project.Classes.ModelClasses.DeepLearning.ModelC import ModelC
+from Project.Classes.ModelClasses.DeepLearning.ModelD import ModelD
+from Project.Classes.ModelClasses.DeepLearning.ModelE import ModelE
 
 # Functions
 from Project.Classes.Shared.shared_functions import print_shape
@@ -183,3 +197,186 @@ knn = KNN(k=1)
 knn.fit(X_train_KNN, y_train_KNN)
 
 knn.evaluate(X_test_KNN, y_test_KNN)
+
+
+
+#####################################################################
+#                          DATA FOR MODELS                          #
+#####################################################################
+
+data_train_Supervised_Learning = X_train_KNN.replace([np.inf, -np.inf], np.nan)
+data_train_Supervised_Learning.fillna(data_train_Supervised_Learning.mean(), inplace=True)
+
+labels_train_Supervised_Learning = new_features.labels_train
+
+data_test_Supervised_Learning = X_test_KNN.replace([np.inf, -np.inf], np.nan)
+data_test_Supervised_Learning.fillna(data_test_Supervised_Learning.mean(), inplace=True)
+
+labels_test_Supervised_Learning = new_features.labels_test
+
+
+
+#####################################################################
+#                         LINEAR REGRESSION                         #
+#####################################################################
+
+linear_regression_model = LinearRegressionModel()
+linear_regression_model.fit_and_evaluate(
+    data_train_Supervised_Learning,
+    labels_train_Supervised_Learning,
+    data_test_Supervised_Learning,
+    labels_test_Supervised_Learning
+)
+
+
+
+#####################################################################
+#                               SVM                                 #
+#####################################################################
+
+svm_model = SVMModel()
+svm_model.fit_and_evaluate(
+    data_train_Supervised_Learning,
+    labels_train_Supervised_Learning,
+    data_test_Supervised_Learning,
+    labels_test_Supervised_Learning
+)
+
+
+
+#####################################################################
+#                               MLP                                 #
+#####################################################################
+
+mlp_model = MLPModel()
+mlp_model.fit_and_evaluate(
+    data_train_Supervised_Learning,
+    labels_train_Supervised_Learning,
+    data_test_Supervised_Learning,
+    labels_test_Supervised_Learning
+)
+
+
+
+#####################################################################
+#                         LASSO REGRESSION                          #
+#####################################################################
+
+lasso_regression_model = LassoRegressionModel()
+lasso_regression_model.fit_and_evaluate(
+    data_train_Supervised_Learning,
+    labels_train_Supervised_Learning,
+    data_test_Supervised_Learning,
+    labels_test_Supervised_Learning
+)
+
+
+
+#####################################################################
+#                         RIDGE REGRESSION                          #
+#####################################################################
+
+ridge_regression_model = RidgeRegressionModel()
+ridge_regression_model.fit_and_evaluate(
+    data_train_Supervised_Learning,
+    labels_train_Supervised_Learning,
+    data_test_Supervised_Learning,
+    labels_test_Supervised_Learning
+)
+
+
+
+#####################################################################
+#                        GRADIENT BOOSTING                          #
+#####################################################################
+
+gradient_boosting_model = GradientBoostingModel()
+gradient_boosting_model.fit_and_evaluate(
+    data_train_Supervised_Learning,
+    labels_train_Supervised_Learning,
+    data_test_Supervised_Learning,
+    labels_test_Supervised_Learning
+)
+
+
+
+#####################################################################
+#                         RANDOM FOREST                            #
+#####################################################################
+
+random_forest_model = RandomForestModel()
+random_forest_model.fit_and_evaluate(
+    data_train_Supervised_Learning,
+    labels_train_Supervised_Learning,
+    data_test_Supervised_Learning,
+    labels_test_Supervised_Learning
+)
+
+
+train_data = data_train_Supervised_Learning
+train_labels = labels_train_Supervised_Learning
+test_data = data_test_Supervised_Learning
+test_labels = labels_test_Supervised_Learning
+
+#####################################################################
+#                             MODEL A                              #
+#####################################################################
+
+dl_model_A = ModelA()
+deep_learning_model_A = dl_model_A.train_and_evaluate(
+    train_data,
+    train_labels,
+    test_data,
+    test_labels
+)
+
+
+
+#####################################################################
+#                             MODEL B                              #
+#####################################################################
+
+dl_model_B = ModelB()
+deep_learning_model_B = dl_model_B.train_and_evaluate(
+    train_data,
+    train_labels,
+    test_data,
+    test_labels
+)
+
+
+
+#####################################################################
+#                             MODEL C                              #
+#####################################################################
+
+deep_learning_model_C = ModelC(
+    train_data,
+    train_labels,
+    test_data,
+    test_labels
+).train_and_evaluate()
+
+
+#####################################################################
+#                             MODEL D                              #
+#####################################################################
+
+deep_learning_model_D = ModelD(
+    train_data,
+    train_labels,
+    test_data,
+    test_labels
+). train_and_evaluate()
+
+
+#####################################################################
+#                             MODEL E                              #
+#####################################################################
+
+deep_learning_model_E = ModelE(
+    train_data,
+    train_labels,
+    test_data,
+    test_labels
+).train_and_evaluate()
