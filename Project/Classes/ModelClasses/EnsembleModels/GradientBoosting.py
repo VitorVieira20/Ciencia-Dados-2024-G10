@@ -43,6 +43,7 @@ class GradientBoostingModel:
         # Getting the best parameters and R^2 score
         print("Best Gradient Boosting Parameters:", grid_search.best_params_)
         print("Best R^2 Score:", grid_search.best_score_)
+        print("-----------------------------------------------------\n")
 
         # Getting the best trained model
         best_gb_model = grid_search.best_estimator_

@@ -5,21 +5,22 @@ import warnings
 warnings.filterwarnings("ignore")
 
 # Classes
-from Project.Classes.data_loader import DataLoader
-from Project.Classes.clean_data import CleanData
-from Project.Classes.filter_locations import FilterLocations
+from Project.Classes.Shared.data_loader import DataLoader
+from Project.Classes.Shared.clean_data import CleanData
+from Project.Classes.Shared.filter_locations import FilterLocations
 from Project.Classes.Outliers.price_sqft_outliers import RemovePriceBySquareFeatOutliers
 from Project.Classes.Outliers.price_location_outliers import RemovePriceLocationsOutliers
 from Project.Classes.Outliers.bedrooms_outliers import RemoveBedroomsOutliers
 from Project.Classes.Outliers.remove_remaining_outliers import RemoveRemainingOutliers
-from Project.Classes.dimensionality_reduction import DimensionalityReduction
-from Project.Classes.hypothesis_tester import HypothesisTester
-from Project.Classes.feature_engineering import FeatureEngineering
-from Project.Classes.model_selection import ModelSelection
+from Project.Classes.Shared.dimensionality_reduction import DimensionalityReduction
+from Project.Classes.Shared.hypothesis_tester import HypothesisTester
+from Project.Classes.Shared.feature_engineering import FeatureEngineering
+from Project.Classes.Shared.model_selection import ModelSelection
 
 # Models
 from Project.Classes.ModelClasses.KNNRegression import KNNRegression
 from Project.Classes.ModelClasses.SupervisedLearning.LinearRegression import LinearRegressionModel
+from Project.Classes.ModelClasses.SupervisedLearning.DecisionTreeRegression import DecisionTreeRegressionModel
 from Project.Classes.ModelClasses.SupervisedLearning.SVM import SVMModel
 from Project.Classes.ModelClasses.SupervisedLearning.MLP import MLPModel
 from Project.Classes.ModelClasses.SupervisedLearning.LassoRegression import LassoRegressionModel
@@ -232,6 +233,20 @@ labels_test_Supervised_Learning = new_features.labels_test
 
 linear_regression_model = LinearRegressionModel()
 linear_regression_model.fit_and_evaluate(
+    data_train_Supervised_Learning,
+    labels_train_Supervised_Learning,
+    data_test_Supervised_Learning,
+    labels_test_Supervised_Learning
+)
+
+
+
+#####################################################################
+#                           DECISION TREE                           #
+#####################################################################
+
+decision_tree_model = DecisionTreeRegressionModel()
+decision_tree_model.fit_and_evaluate(
     data_train_Supervised_Learning,
     labels_train_Supervised_Learning,
     data_test_Supervised_Learning,

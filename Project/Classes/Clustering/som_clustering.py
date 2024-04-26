@@ -6,6 +6,15 @@ from sklearn.cluster import KMeans
 
 class SOMClustering:
     def see_som_clustering(self, data):
+        """
+        Perform Self-Organizing Map (SOM) clustering on the input data and visualize the results.
+
+        Parameters:
+        - data: Input data for clustering
+
+        Returns:
+        - None
+        """
         print("\nSOM Clustering...")
 
         X = data[['bath', 'rooms', 'room_bath_ratio', 'room_balcony_ratio']]
@@ -47,7 +56,7 @@ class SOMClustering:
         plt.show()
 
         plt.figure(figsize=(10, 10))
-        plt.pcolor(som_weights[:, :, 0].T, cmap='coolwarm')
+        plt.pcolor(som_weights[:, :, 0].T, cmap='viridis')
         plt.colorbar()
         plt.title('Heatmap of Neuron Weights')
         plt.show()

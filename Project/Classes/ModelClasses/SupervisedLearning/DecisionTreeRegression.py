@@ -1,9 +1,10 @@
 from sklearn.model_selection import GridSearchCV
+from sklearn.tree import DecisionTreeRegressor
 
 # Importing custom functions from shared_functions module
 from Project.Classes.Shared.shared_functions import models_predictions_plot, models_residuals_plot
 
-class DecisionTreeRegressor:
+class DecisionTreeRegressionModel:
     def fit_and_evaluate(self, data_train, labels_train, data_test, labels_test):
         """
         Fits and evaluates a Decision Tree Regressor model.
@@ -41,6 +42,7 @@ class DecisionTreeRegressor:
         # Getting the best hyperparameters and R^2 score
         print("Best Hyperparameters:", grid_search.best_params_)
         print("Best R^2 Score:", grid_search.best_score_)
+        print("-----------------------------------------------------\n")
 
         # Getting the best trained model
         best_dt_model = grid_search.best_estimator_

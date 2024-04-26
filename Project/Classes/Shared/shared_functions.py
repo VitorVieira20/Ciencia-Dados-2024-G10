@@ -1,7 +1,7 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 
-from Project.Classes.visualize_data import VisualizeData
+from Project.Classes.Shared.visualize_data import VisualizeData
 
 def print_shape(data, data_name):
     print(f"Data: {data_name}")

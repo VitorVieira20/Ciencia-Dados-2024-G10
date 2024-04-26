@@ -61,7 +61,7 @@ class LinearRegressionModel:
         # Printing evaluation metrics
         print("Linear Regression MSE:", linear_mse)
         print("Linear Regression R^2:", linear_r2)
-        print("-----------------------------------------------------")
+        print("-----------------------------------------------------\n")
 
         # Plotting predictions and residuals
         models_predictions_plot(labels_test, linear_predictions, 'Linear Regression')

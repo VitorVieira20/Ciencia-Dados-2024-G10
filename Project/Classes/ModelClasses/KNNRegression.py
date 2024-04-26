@@ -94,11 +94,16 @@ class KNNRegression:
             X_test (array-like): Test data features.
             y_test (array-like): Test data target values.
         """
+
+        print("\nKNN Model fit and evaluation...")
+
         # Making predictions on test data
         predictions = self.predict(X_test)
 
         # Calculating R² score
         r2 = r2_score(y_test, predictions)
 
+
         print("KNN Regression Score:", r2)
+        print("-----------------------------------------------------\n")
         return r2

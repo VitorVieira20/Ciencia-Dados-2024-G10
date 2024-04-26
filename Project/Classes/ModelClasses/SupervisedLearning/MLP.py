@@ -45,6 +45,7 @@ class MLPModel:
         # Getting the best hyperparameters and R^2 score
         print("Best Hyperparameters:", grid_search.best_params_)
         print("Best R^2 Score:", grid_search.best_score_)
+        print("-----------------------------------------------------\n")
 
         # Getting the best trained model
         best_mlp_model = grid_search.best_estimator_

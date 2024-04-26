@@ -40,6 +40,7 @@ class SVMModel:
         # Getting the best parameters and R^2 score
         print("Best parameters found:", svm_grid_search.best_params_)
         print("Best R^2 score found:", svm_grid_search.best_score_)
+        print("-----------------------------------------------------\n")
 
         # Getting the best trained model
         best_svm_model = svm_grid_search.best_estimator_

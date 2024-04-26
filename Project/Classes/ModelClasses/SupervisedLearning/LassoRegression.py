@@ -40,6 +40,7 @@ class LassoRegressionModel:
         # Getting the best parameters and R^2 score
         print("Best Lasso Regression Parameters:", grid_search.best_params_)
         print("Best R^2 Score:", grid_search.best_score_)
+        print("-----------------------------------------------------\n")
 
         # Getting the best trained model
         best_lasso_model = grid_search.best_estimator_
