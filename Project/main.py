@@ -103,7 +103,7 @@ plot_data_visualizations(remove_outliers.data_train, ['Electronic City', 'Raja R
 time.sleep(40)
 
 # Show data after removing the last outliers
-plot_data_visualizations(remove_more_outliers, ['Electronic City', 'Raja Rajeshwari Nagar', 'Sarjapur  Road'])
+plot_data_visualizations(remove_more_outliers.data_train, ['Electronic City', 'Raja Rajeshwari Nagar', 'Sarjapur  Road'])
 time.sleep(40)
 
 
