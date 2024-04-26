@@ -1,51 +1,54 @@
 from sklearn.linear_model import Ridge
 from sklearn.metrics import mean_squared_error, r2_score
+from sklearn.model_selection import GridSearchCV
+
+# Importing custom functions from shared_functions module
 from Project.Classes.Shared.shared_functions import models_predictions_plot, models_residuals_plot, models_training_loss_plot
 
 class RidgeRegressionModel:
-    def _fit_model(self, data_train, labels_train, params):
-        ridge_model = Ridge(max_iter=10000, **params)
-        ridge_model.fit(data_train, labels_train)
-        return ridge_model
-
-    def _evaluate_model(self, model, data_test, labels_test):
-        ridge_predictions = model.predict(data_test)
-        mse = mean_squared_error(labels_test, ridge_predictions)
-        r2 = r2_score(labels_test, ridge_predictions)
-        return {'mse': mse, 'r2': r2}
-
     def fit_and_evaluate(self, data_train, labels_train, data_test, labels_test):
-        hyperparameters = [
-            {'alpha': 0.1},
-            {'alpha': 1},
-            {'alpha': 10},
-            {'alpha': 100},
-        ]
+        """
+        Fits and evaluates a Ridge Regression model.
 
-        results = []
+        Parameters:
+        - data_train: Training data
+        - labels_train: Labels for training data
+        - data_test: Test data
+        - labels_test: Labels for test data
 
-        for params in hyperparameters:
-            ridge_model = self._fit_model(data_train, labels_train, params)
-            evaluation_result = self._evaluate_model(ridge_model, data_test, labels_test)
-            results.append({'params': params, 'mse': evaluation_result['mse'], 'r2': evaluation_result['r2']})
+        Returns:
+        - best_ridge_model: Best trained Ridge Regression model
+        """
 
-        sorted_results = sorted(results, key=lambda x: x['r2'], reverse=True)
+        # Ridge Regression Model
+        print("Ridge Regression Model fit and evaluation...")
 
-        for result in sorted_results:
-            print("Parameters:", result['params'])
-            print("Ridge Regression MSE:", result['mse'])
-            print("Ridge Regression R^2:", result['r2'])
-            print("---------------------------------------------")
+        # Hyperparameters grid for GridSearchCV
+        hyperparameters = {
+            'alpha': [0.1, 1, 10, 100]
+        }
 
-        best_params = max(results, key=lambda x: x['r2'])['params']
-        best_model = self._fit_model(data_train, labels_train, best_params)
+        # Initializing Ridge Regression model
+        ridge_model = Ridge(max_iter=10000)
 
-        print("Best Ridge Regression Parameters:", best_params)
-        evaluation_result = self._evaluate_model(best_model, data_test, labels_test)
-        print("Ridge Regression MSE:", evaluation_result['mse'])
-        print("Ridge Regression R^2:", evaluation_result['r2'])
+        # GridSearchCV for hyperparameter tuning
+        grid_search = GridSearchCV(ridge_model, hyperparameters, scoring='r2', cv=5, n_jobs=-1)
 
-        models_predictions_plot(labels_test, best_model.predict(data_test), 'Ridge Regression')
-        models_residuals_plot(labels_test, best_model.predict(data_test), 'Ridge Regression')
+        # Fitting the model and tuning hyperparameters
+        grid_search.fit(data_train, labels_train)
 
-        return best_model
+        # Getting the best parameters and R^2 score
+        print("Best Ridge Regression Parameters:", grid_search.best_params_)
+        print("Best R^2 Score:", grid_search.best_score_)
+
+        # Getting the best trained model
+        best_ridge_model = grid_search.best_estimator_
+
+        # Making predictions on test data
+        ridge_predictions = best_ridge_model.predict(data_test)
+
+        # Plotting predictions and residuals
+        models_predictions_plot(labels_test, ridge_predictions, 'Ridge Regression')
+        models_residuals_plot(labels_test, ridge_predictions, 'Ridge Regression')
+
+        return  best_ridge_model

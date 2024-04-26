@@ -1,51 +1,54 @@
 from sklearn.linear_model import Lasso
 from sklearn.metrics import mean_squared_error, r2_score
+from sklearn.model_selection import GridSearchCV
+
+# Importing custom functions from shared_functions module
 from Project.Classes.Shared.shared_functions import models_predictions_plot, models_residuals_plot, models_training_loss_plot
 
 class LassoRegressionModel:
-    def _fit_model(self, data_train, labels_train, params):
-        lasso_model = Lasso(max_iter=10000, **params)
-        lasso_model.fit(data_train, labels_train)
-        return lasso_model
-
-    def _evaluate_model(self, model, data_test, labels_test):
-        lasso_predictions = model.predict(data_test)
-        mse = mean_squared_error(labels_test, lasso_predictions)
-        r2 = r2_score(labels_test, lasso_predictions)
-        return {'mse': mse, 'r2': r2}
-
     def fit_and_evaluate(self, data_train, labels_train, data_test, labels_test):
-        hyperparameters = [
-            {'alpha': 0.1},
-            {'alpha': 0.01},
-            {'alpha': 0.001},
-            {'alpha': 0.0001},
-        ]
+        """
+        Fits and evaluates a Lasso Regression model.
 
-        results = []
+        Parameters:
+        - data_train: Training data
+        - labels_train: Labels for training data
+        - data_test: Test data
+        - labels_test: Labels for test data
 
-        for params in hyperparameters:
-            lasso_model = self._fit_model(data_train, labels_train, params)
-            evaluation_result = self._evaluate_model(lasso_model, data_test, labels_test)
-            results.append({'params': params, 'mse': evaluation_result['mse'], 'r2': evaluation_result['r2']})
+        Returns:
+        - best_lasso_model: Best trained Lasso Regression model
+        """
 
-        sorted_results = sorted(results, key=lambda x: x['r2'], reverse=True)
+        # Lasso Regression Model
+        print("Lasso Regression Model fit and evaluation...")
 
-        for result in sorted_results:
-            print("Parameters:", result['params'])
-            print("Lasso Regression MSE:", result['mse'])
-            print("Lasso Regression R^2:", result['r2'])
-            print("---------------------------------------------")
+        # Hyperparameters grid for GridSearchCV
+        hyperparameters = {
+            'alpha': [0.1, 0.01, 0.001, 0.0001]
+        }
 
-        best_params = max(results, key=lambda x: x['r2'])['params']
-        best_model = self._fit_model(data_train, labels_train, best_params)
+        # Initializing Lasso Regression model
+        lasso_model = Lasso(max_iter=10000)
 
-        print("Best Lasso Regression Parameters:", best_params)
-        evaluation_result = self._evaluate_model(best_model, data_test, labels_test)
-        print("Lasso Regression MSE:", evaluation_result['mse'])
-        print("Lasso Regression R^2:", evaluation_result['r2'])
+        # GridSearchCV for hyperparameter tuning
+        grid_search = GridSearchCV(lasso_model, hyperparameters, scoring='r2', cv=5, n_jobs=-1)
 
-        models_predictions_plot(labels_test, best_model.predict(data_test), 'Lasso Regression')
-        models_residuals_plot(labels_test, best_model.predict(data_test), 'Lasso Regression')
+        # Fitting the model and tuning hyperparameters
+        grid_search.fit(data_train, labels_train)
 
-        return best_model
+        # Getting the best parameters and R^2 score
+        print("Best Lasso Regression Parameters:", grid_search.best_params_)
+        print("Best R^2 Score:", grid_search.best_score_)
+
+        # Getting the best trained model
+        best_lasso_model = grid_search.best_estimator_
+
+        # Making predictions on test data
+        lasso_predictions = best_lasso_model.predict(data_test)
+
+        # Plotting predictions and residuals
+        models_predictions_plot(labels_test, lasso_predictions, 'Lasso Regression')
+        models_residuals_plot(labels_test, lasso_predictions, 'Lasso Regression')
+
+        return best_lasso_model

@@ -32,30 +32,30 @@ def plot_data_visualizations(data, locations):
 def print_hypothesis_result(title, stat_type, stat, value_type, value):
     print(f"\n{title}")
     print(f"{stat_type}: {stat}")
-    print(f"{value_type}: {value}")
+    print(f"{value_type}: {value}\n")
 
 
 def data_for_KNN(data):
-    data_train_encoded = pd.get_dummies(data.data_train['location'], dtype=int)
-    data_test_encoded = pd.get_dummies(data.data_test['location'], dtype=int)
+    data_encoded_train = pd.get_dummies(data.data_train['location'], dtype=int)
+    data_encoded_test = pd.get_dummies(data.data_test['location'], dtype=int)
 
-    data_train_encoded.fillna(0, inplace=True)
-    data_test_encoded.fillna(0, inplace=True)
+    data_encoded_train.fillna(0, inplace=True)
+    data_encoded_test.fillna(0, inplace=True)
 
-    data_test_encoded = data_test_encoded.reindex(columns=data_train_encoded.columns, fill_value=0)
+    data_encoded_test = data_encoded_test.reindex(columns=data_encoded_train.columns, fill_value=0)
 
-    X_train_dummies = pd.concat([data.data_train.drop('location', axis=1), data_train_encoded], axis=1)
-    X_test_dummies = pd.concat([data.data_test.drop('location', axis=1), data_test_encoded], axis=1)
+    data_train_with_dummies = pd.concat([data.data_train.drop('location', axis=1), data_encoded_train], axis=1)
+    data_test_with_dummies = pd.concat([data.data_test.drop('location', axis=1), data_encoded_test], axis=1)
 
-    X_train = X_train_dummies.drop('price', axis=1)
-    X_test = X_test_dummies.drop('price', axis=1)
-    y_train = data.labels_train
-    y_test = data.labels_test
+    X_train_data = data_train_with_dummies.drop(['price', 'price_per_sqft'], axis=1)
+    X_test_data = data_test_with_dummies.drop(['price', 'price_per_sqft'], axis=1)
+    y_train_data = data.labels_train
+    y_test_data = data.labels_test
 
-    X_train.reset_index(drop=True, inplace=True)
-    y_train.reset_index(drop=True, inplace=True)
+    X_train_data.reset_index(drop=True, inplace=True)
+    y_train_data.reset_index(drop=True, inplace=True)
 
-    return X_train, X_test, y_train, y_test
+    return X_train_data, X_test_data, y_train_data, y_test_data
 
 def models_predictions_plot(test_labels, model_predictions, model_name):
     plt.figure(figsize=(10, 6))

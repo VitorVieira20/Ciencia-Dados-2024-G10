@@ -4,6 +4,9 @@ import numpy as np
 import pandas as pd
 import os
 
+# If the best model is KNN, it will be necessary this import
+from Project.Classes.ModelClasses.KNNRegression import KNNRegression
+
 __locations = None
 __data_columns = None
 __model = None
@@ -39,7 +42,7 @@ def load_columns():
     global __model
 
     # Folder created in the Jupyter Notebook or another with the same structure
-    models_dir = '../../Project/Models4/'
+    models_dir = '../../Project/Models1/'
 
     data_columns_path = models_dir + 'data_columns.json'
 
@@ -56,6 +59,7 @@ def load_columns():
         print("Nenhum diretório começando com 'Best' encontrado em", models_dir)
 
     best_model_path = best_model_dir + '/best_model.pkl'
+    print(best_model_path)
 
     with open(data_columns_path, 'r') as f:
         __data_columns = json.loads(f.read())

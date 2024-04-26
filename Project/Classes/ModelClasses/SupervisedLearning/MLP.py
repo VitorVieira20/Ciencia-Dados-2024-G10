@@ -1,56 +1,59 @@
+from sklearn.model_selection import GridSearchCV
 from sklearn.neural_network import MLPRegressor
-from sklearn.metrics import mean_squared_error, r2_score
+
+# Importing custom functions from shared_functions module
 from Project.Classes.Shared.shared_functions import models_predictions_plot, models_residuals_plot, models_training_loss_plot
 
 class MLPModel:
-    def _fit_model(self, data_train, labels_train, params):
-        mlp_model = MLPRegressor(**params)
-        mlp_model.fit(data_train, labels_train)
-        return mlp_model
-
-    def _evaluate_model(self, model, data_test, labels_test):
-        mlp_predictions = model.predict(data_test)
-        mse = mean_squared_error(labels_test, mlp_predictions)
-        r2 = r2_score(labels_test, mlp_predictions)
-        return {'mse': mse, 'r2': r2}
-
     def fit_and_evaluate(self, data_train, labels_train, data_test, labels_test):
-        hyperparameters = [
-            {'hidden_layer_sizes': (100,), 'activation': 'relu', 'solver': 'adam', 'max_iter': 500},
-            {'hidden_layer_sizes': (100, 50), 'activation': 'relu', 'solver': 'adam', 'max_iter': 500},
-            {'hidden_layer_sizes': (50,), 'activation': 'logistic', 'solver': 'sgd', 'max_iter': 1000},
-            {'hidden_layer_sizes': (50, 20), 'activation': 'tanh', 'solver': 'adam', 'max_iter': 1000},
-            {'hidden_layer_sizes': (50, 50, 50), 'activation': 'relu', 'solver': 'adam', 'max_iter': 1000},
-            {'hidden_layer_sizes': (100,), 'activation': 'relu', 'solver': 'adam', 'max_iter': 1000, 'alpha': 0.0001},
-            {'hidden_layer_sizes': (100,), 'activation': 'relu', 'solver': 'adam', 'max_iter': 1000, 'learning_rate': 'constant'},
-            {'hidden_layer_sizes': (100,), 'activation': 'relu', 'solver': 'adam', 'max_iter': 1000, 'learning_rate_init': 0.001},
-        ]
+        """
+        Fits and evaluates a Multi-layer Perceptron (MLP) model.
 
-        results = []
+        Parameters:
+        - data_train: Training data
+        - labels_train: Labels for training data
+        - data_test: Test data
+        - labels_test: Labels for test data
 
-        for params in hyperparameters:
-            mlp_model = self._fit_model(data_train, labels_train, params)
-            evaluation_result = self._evaluate_model(mlp_model, data_test, labels_test)
-            results.append({'params': params, 'mse': evaluation_result['mse'], 'r2': evaluation_result['r2']})
+        Returns:
+        - best_mlp_model: Best trained MLP model
+        """
 
-        sorted_results = sorted(results, key=lambda x: x['r2'], reverse=True)
+        # Multi-layer Perceptron (MLP) Model
+        print("MLP Model fit and evaluation...")
 
-        for result in sorted_results:
-            print("Parameters:", result['params'])
-            print("MLP MSE:", result['mse'])
-            print("MLP R^2:", result['r2'])
-            print("---------------------------------------------")
+        # Hyperparameters grid for GridSearchCV
+        hyperparameters = {
+            'hidden_layer_sizes': [(100,), (100, 50), (50,), (50, 20), (50, 50, 50)],
+            'activation': ['relu', 'logistic', 'tanh'],
+            'solver': ['adam', 'sgd'],
+            'max_iter': [500, 1000],
+            'alpha': [0.0001],
+            'learning_rate': ['constant'],
+            'learning_rate_init': [0.001]
+        }
 
-        best_params = max(results, key=lambda x: x['r2'])['params']
-        best_model = self._fit_model(data_train, labels_train, best_params)
+        # Initializing MLP model
+        mlp_model = MLPRegressor()
 
-        print("Best MLP Parameters:", best_params)
-        evaluation_result = self._evaluate_model(best_model, data_test, labels_test)
-        print("MLP MSE:", evaluation_result['mse'])
-        print("MLP R^2:", evaluation_result['r2'])
+        # GridSearchCV for hyperparameter tuning
+        grid_search = GridSearchCV(mlp_model, hyperparameters, scoring='r2', cv=5, n_jobs=-1)
 
-        models_predictions_plot(labels_test, best_model.predict(data_test), 'MLP')
-        models_residuals_plot(labels_test, best_model.predict(data_test), 'MLP')
-        models_training_loss_plot(best_model, 'MLP')
+        # Fitting the model and tuning hyperparameters
+        grid_search.fit(data_train, labels_train)
 
-        return best_model
+        # Getting the best hyperparameters and R^2 score
+        print("Best Hyperparameters:", grid_search.best_params_)
+        print("Best R^2 Score:", grid_search.best_score_)
+
+        # Getting the best trained model
+        best_mlp_model = grid_search.best_estimator_
+
+        # Making predictions on test data
+        mlp_predictions = best_mlp_model.predict(data_test)
+
+        # Plotting predictions and residuals
+        models_predictions_plot(labels_test, mlp_predictions, 'MLP')
+        models_residuals_plot(labels_test, mlp_predictions, 'MLP')
+
+        return best_mlp_model

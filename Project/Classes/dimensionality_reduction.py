@@ -51,8 +51,8 @@ class DimensionalityReduction:
         - projection: The projected data.
         - title: The title of the plot.
         """
-        plt.figure(figsize=(8, 6))
-        plt.scatter(projection[:, 0], projection[:, 1], c=self.targets, alpha=0.5)
+        plt.figure(figsize=(8, 6), facecolor='white')
+        plt.scatter(projection[:, 0], projection[:, 1], c=self.targets, cmap='Blues', alpha=0.5)
         plt.title(title)
         plt.xlabel('Component 1')
         plt.ylabel('Component 2')

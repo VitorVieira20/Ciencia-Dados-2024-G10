@@ -17,8 +17,8 @@ class VisualizeData:
         room2 = df[(df['location'] == location) & (df['rooms'] == 2)]
         room3 = df[(df['location'] == location) & (df['rooms'] == 3)]
         matplotlib.rcParams['figure.figsize'] = (15, 10)
-        plt.scatter(room2['total_sqft'], room2['price'], color='blue', label='2 Rooms', s=50)
-        plt.scatter(room3['total_sqft'], room3['price'], marker='p', color='red', label='3 Rooms', s=50)
+        sns.scatterplot(data=room2, x='total_sqft', y='price', color='skyblue', label='2 Rooms', s=50)
+        sns.scatterplot(data=room3, x='total_sqft', y='price', color='salmon', marker='p', label='3 Rooms', s=50)
         plt.xlabel("Total Square Feet Area")
         plt.ylabel("Price (Lakh Indian Rupees)")
         plt.title(location)
@@ -34,7 +34,7 @@ class VisualizeData:
         room2 = df[(df['location'] == location) & (df['rooms'] == 2)]
         room3 = df[(df['location'] == location) & (df['rooms'] == 3)]
         plt.figure(figsize=(15, 10))
-        sns.boxplot(x='rooms', y='price', data=pd.concat([room2, room3]), hue='rooms')
+        sns.boxplot(x='rooms', y='price', data=pd.concat([room2, room3]), hue='rooms', palette='pastel')
         plt.xlabel("Number of Rooms")
         plt.ylabel("Price (Lakh Indian Rupees)")
         plt.title(f'Boxplot for {location}')
@@ -50,7 +50,7 @@ class VisualizeData:
         room2 = df[(df['location'] == location) & (df['rooms'] == 2)]
         room3 = df[(df['location'] == location) & (df['rooms'] == 3)]
         plt.figure(figsize=(15, 10))
-        sns.violinplot(x='rooms', y='price', data=pd.concat([room2, room3]), hue='rooms')
+        sns.violinplot(x='rooms', y='price', data=pd.concat([room2, room3]), hue='rooms', palette='pastel')
         plt.xlabel("Number of Rooms")
         plt.ylabel("Price (Lakh Indian Rupees)")
         plt.title(f'Violinplot for {location}')
@@ -65,7 +65,7 @@ class VisualizeData:
         :param location: Specific location in the DataFrame
         '''
         plt.figure(figsize=(8, 6))
-        sns.histplot(df[df['location'] == location][column], kde=True)
+        sns.histplot(df[df['location'] == location][column], kde=True, color='skyblue', linewidth=1)
         plt.xlabel(column)
         plt.ylabel("Frequency")
         plt.title(f'Histogram of {column} in {location}')
@@ -80,6 +80,6 @@ class VisualizeData:
             df = df.drop(columns=['location'])
 
         plt.figure(figsize=(10, 8))
-        sns.heatmap(df.corr(), annot=True, cmap='coolwarm', fmt=".2f")
+        sns.heatmap(df.corr(), annot=True, cmap='viridis', fmt=".2f")
         plt.title("Correlation Heatmap")
         plt.show()

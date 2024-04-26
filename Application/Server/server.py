@@ -1,6 +1,9 @@
 from flask import Flask, request, jsonify
 import util
 
+# If the best model is KNN, it will be necessary this import
+from Project.Classes.ModelClasses.KNNRegression import KNNRegression
+
 app = Flask(__name__)
 
 util.load_columns()

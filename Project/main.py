@@ -1,6 +1,8 @@
 import pandas as pd
 import numpy as np
 import time
+import warnings
+warnings.filterwarnings("ignore")
 
 # Classes
 from Project.Classes.data_loader import DataLoader
@@ -16,7 +18,7 @@ from Project.Classes.feature_engineering import FeatureEngineering
 from Project.Classes.model_selection import ModelSelection
 
 # Models
-from Project.Classes.ModelClasses.KNN import KNN
+from Project.Classes.ModelClasses.KNNRegression import KNNRegression
 from Project.Classes.ModelClasses.SupervisedLearning.LinearRegression import LinearRegressionModel
 from Project.Classes.ModelClasses.SupervisedLearning.SVM import SVMModel
 from Project.Classes.ModelClasses.SupervisedLearning.MLP import MLPModel
@@ -24,11 +26,11 @@ from Project.Classes.ModelClasses.SupervisedLearning.LassoRegression import Lass
 from Project.Classes.ModelClasses.SupervisedLearning.RidgeRegression import RidgeRegressionModel
 from Project.Classes.ModelClasses.EnsembleModels.GradientBoosting import GradientBoostingModel
 from Project.Classes.ModelClasses.EnsembleModels.RandomForest import RandomForestModel
-from Project.Classes.ModelClasses.DeepLearning.ModelA import ModelA
-from Project.Classes.ModelClasses.DeepLearning.ModelB import ModelB
-from Project.Classes.ModelClasses.DeepLearning.ModelC import ModelC
-from Project.Classes.ModelClasses.DeepLearning.ModelD import ModelD
-from Project.Classes.ModelClasses.DeepLearning.ModelE import ModelE
+
+# Clustering
+from Project.Classes.Clustering.hierarchical_clustering import HierarchicalClustering
+from Project.Classes.Clustering.kmeans_clustering import KmeansClustering
+from Project.Classes.Clustering.som_clustering import SOMClustering
 
 # Functions
 from Project.Classes.Shared.shared_functions import print_shape
@@ -73,6 +75,11 @@ remove_outliers = RemoveRemainingOutliers(remove_bedroom)
 remove_outliers.remove_outliers()
 print_shape(remove_outliers, "Remove remaining outliers")
 
+# Remove more outliers
+remove_more_outliers = FilterLocations(remove_outliers)
+remove_more_outliers.clean_data()
+print_shape(remove_more_outliers, "Remove last outliers")
+
 
 
 #####################################################################
@@ -95,6 +102,9 @@ time.sleep(40)
 plot_data_visualizations(remove_outliers.data_train, ['Electronic City', 'Raja Rajeshwari Nagar', 'Sarjapur  Road'])
 time.sleep(40)
 
+# Show data after removing the last outliers
+plot_data_visualizations(remove_more_outliers, ['Electronic City', 'Raja Rajeshwari Nagar', 'Sarjapur  Road'])
+time.sleep(40)
 
 
 #####################################################################
@@ -102,10 +112,10 @@ time.sleep(40)
 #####################################################################
 
 # Our data
-data = remove_outliers.data_train.drop(columns=["price", "location"])
+data = remove_more_outliers.data_train[['total_sqft', 'bath', 'balcony', 'rooms', 'price_per_sqft']]
 
 # Our target
-targets = remove_outliers.labels_train
+targets = remove_more_outliers.labels_train
 
 # Initialize DimensionalityReduction object
 dr = DimensionalityReduction(data, targets)
@@ -156,7 +166,7 @@ print_hypothesis_result("Paired t-test for total_sqft and price within Raja Raje
 #####################################################################
 
 # Create new features based on feature engineering
-new_features = FeatureEngineering(remove_outliers)
+new_features = FeatureEngineering(remove_more_outliers)
 new_features.create_features()
 print_shape(new_features, "Data with new features")
 
@@ -193,7 +203,7 @@ ms.select_model()
 KNN_data = new_features
 X_train_KNN, X_test_KNN, y_train_KNN, y_test_KNN = data_for_KNN(KNN_data)
 
-knn = KNN(k=1)
+knn = KNNRegression(k=3)
 knn.fit(X_train_KNN, y_train_KNN)
 
 knn.evaluate(X_test_KNN, y_test_KNN)
@@ -312,71 +322,29 @@ random_forest_model.fit_and_evaluate(
     labels_test_Supervised_Learning
 )
 
-
 train_data = data_train_Supervised_Learning
 train_labels = labels_train_Supervised_Learning
 test_data = data_test_Supervised_Learning
 test_labels = labels_test_Supervised_Learning
 
-#####################################################################
-#                             MODEL A                              #
-#####################################################################
 
-dl_model_A = ModelA()
-deep_learning_model_A = dl_model_A.train_and_evaluate(
-    train_data,
-    train_labels,
-    test_data,
-    test_labels
-)
+#####################################################################
+#                          DEEP LEARNING                            #
+#####################################################################
 
 
 
 #####################################################################
-#                             MODEL B                              #
+#                            CLUSTERING                             #
 #####################################################################
 
-dl_model_B = ModelB()
-deep_learning_model_B = dl_model_B.train_and_evaluate(
-    train_data,
-    train_labels,
-    test_data,
-    test_labels
-)
+hierarchical_clustering = HierarchicalClustering()
+hierarchical_clustering.see_cluster_plots(train_data)
 
 
-
-#####################################################################
-#                             MODEL C                              #
-#####################################################################
-
-deep_learning_model_C = ModelC(
-    train_data,
-    train_labels,
-    test_data,
-    test_labels
-).train_and_evaluate()
+kmeans_clustering = KmeansClustering()
+kmeans_clustering.see_optimize_k(train_data)
 
 
-#####################################################################
-#                             MODEL D                              #
-#####################################################################
-
-deep_learning_model_D = ModelD(
-    train_data,
-    train_labels,
-    test_data,
-    test_labels
-). train_and_evaluate()
-
-
-#####################################################################
-#                             MODEL E                              #
-#####################################################################
-
-deep_learning_model_E = ModelE(
-    train_data,
-    train_labels,
-    test_data,
-    test_labels
-).train_and_evaluate()
+som_clustering = SOMClustering()
+som_clustering.see_som_clustering(train_data)

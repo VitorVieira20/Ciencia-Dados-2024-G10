@@ -24,50 +24,46 @@ class FeatureEngineering:
         self.data_test = self.data_loader.data_test
         self.labels_test = self.data_loader.labels_test
 
-        # Price distribution per bedroom.
-        self.data_train['price_per_bedroom'] = self.data_train['price'] / self.data_train['rooms']
-        self.data_test['price_per_bedroom'] = self.data_test['price'] / self.data_test['rooms']
+        # Area per room: Divides the total area by the number of rooms.
+        self.data_train['area_per_room'] = self.data_train['total_sqft'] / self.data_train['rooms']
+        self.data_test['area_per_room'] = self.data_test['total_sqft'] / self.data_test['rooms']
 
-        # Bathroom to bedroom ratio.
-        self.data_train['bath_per_bedroom'] = self.data_train['bath'] / self.data_train['rooms']
-        self.data_test['bath_per_bedroom'] = self.data_test['bath'] / self.data_test['rooms']
+        # Area per bathroom: Divides the total area by the number of bathrooms.
+        self.data_train['area_per_bath'] = self.data_train['total_sqft'] / self.data_train['bath']
+        self.data_test['area_per_bath'] = self.data_test['total_sqft'] / self.data_test['bath']
 
-        # Space distribution per bedroom.
-        self.data_train['total_sqft_per_room'] = self.data_train['total_sqft'] / self.data_train['rooms']
-        self.data_test['total_sqft_per_room'] = self.data_test['total_sqft'] / self.data_test['rooms']
+        # Area per balcony: Divides the total area by the number of balconies.
+        self.data_train['area_per_balcony'] = self.data_train['total_sqft'] / self.data_train['balcony']
+        self.data_test['area_per_balcony'] = self.data_test['total_sqft'] / self.data_test['balcony']
 
-        # Balcony to bedroom ratio
-        self.data_train['balcony_per_room'] = self.data_train['balcony'] / self.data_train['rooms']
-        self.data_test['balcony_per_room'] = self.data_test['balcony'] / self.data_test['rooms']
+        # Room-to-bathroom ratio: Divides the number of rooms by the number of bathrooms.
+        self.data_train['room_bath_ratio'] = self.data_train['rooms'] / self.data_train['bath']
+        self.data_test['room_bath_ratio'] = self.data_test['rooms'] / self.data_test['bath']
 
-        # Price distribution per bathroom
-        self.data_train['price_per_bath'] = self.data_train['price'] / self.data_train['bath']
-        self.data_test['price_per_bath'] = self.data_test['price'] / self.data_test['bath']
+        # Room-to-balcony ratio: Divides the number of rooms by the number of balconies.
+        self.data_train['room_balcony_ratio'] = self.data_train['rooms'] / self.data_train['balcony']
+        self.data_test['room_balcony_ratio'] = self.data_test['rooms'] / self.data_test['balcony']
 
-        # Space distribution per bathroom
-        self.data_train['total_sqft_per_bath'] = self.data_train['total_sqft'] / self.data_train['bath']
-        self.data_test['total_sqft_per_bath'] = self.data_test['total_sqft'] / self.data_test['bath']
+        # Bathroom-to-balcony ratio: Divides the number of bathrooms by the number of balconies.
+        self.data_train['bath_balcony_ratio'] = self.data_train['bath'] / self.data_train['balcony']
+        self.data_test['bath_balcony_ratio'] = self.data_test['bath'] / self.data_test['balcony']
 
-        # Balcony to bathroom ratio
-        self.data_train['balcony_per_bath'] = self.data_train['balcony'] / self.data_train['bath']
-        self.data_test['balcony_per_bath'] = self.data_test['balcony'] / self.data_test['bath']
+        # Average length per room in square meters.
+        self.data_train['average_length_per_room'] = (self.data_train['total_sqft'] * 0.092903) / self.data_train[
+            'rooms']
+        self.data_test['average_length_per_room'] = (self.data_test['total_sqft'] * 0.092903) / self.data_test['rooms']
 
-        # Price distribution per balcony
-        self.data_train['price_per_balcony'] = self.data_train['price'] / self.data_train['balcony']
-        self.data_test['price_per_balcony'] = self.data_test['price'] / self.data_test['balcony']
+        # Average length per bathroom in square meters.
+        self.data_train['average_length_per_bath'] = (self.data_train['total_sqft'] * 0.092903) / self.data_train[
+            'bath']
+        self.data_test['average_length_per_bath'] = (self.data_test['total_sqft'] * 0.092903) / self.data_test['bath']
 
-        # Space distribution per balcony
-        self.data_train['total_sqft_per_balcony'] = self.data_train['total_sqft'] / self.data_train['balcony']
-        self.data_test['total_sqft_per_balcony'] = self.data_test['total_sqft'] / self.data_test['balcony']
+        # Average length per balcony in square meters.
+        self.data_train['average_length_per_balcony'] = (self.data_train['total_sqft'] * 0.092903) / self.data_train[
+            'balcony']
+        self.data_test['average_length_per_balcony'] = (self.data_test['total_sqft'] * 0.092903) / self.data_test[
+            'balcony']
 
-        # Bedroom to bathroom ratio
-        self.data_train['room_per_bath'] = self.data_train['rooms'] / self.data_train['bath']
-        self.data_test['room_per_bath'] = self.data_test['rooms'] / self.data_test['bath']
-
-        # Calculate the average price
-        average_price_train = self.data_train['price'].mean()
-        average_price_test = self.data_test['price'].mean()
-
-        # Prices above average
-        self.data_train['price_above_average'] = self.data_train['price'] > average_price_train
-        self.data_test['price_above_average'] = self.data_test['price'] > average_price_test
+        # Total number of rooms and bathrooms.
+        self.data_train['total_room_bath'] = self.data_train['rooms'] + self.data_train['bath']
+        self.data_test['total_room_bath'] = self.data_test['rooms'] + self.data_test['bath']
