@@ -27,6 +27,7 @@ from Project.Classes.ModelClasses.SupervisedLearning.LassoRegression import Lass
 from Project.Classes.ModelClasses.SupervisedLearning.RidgeRegression import RidgeRegressionModel
 from Project.Classes.ModelClasses.EnsembleModels.GradientBoosting import GradientBoostingModel
 from Project.Classes.ModelClasses.EnsembleModels.RandomForest import RandomForestModel
+from Project.Classes.ModelClasses.DeepLearning.DeepLearningModel import NeuralNetworkRegressionModel
 
 # Clustering
 from Project.Classes.Clustering.hierarchical_clustering import HierarchicalClustering
@@ -337,15 +338,19 @@ random_forest_model.fit_and_evaluate(
     labels_test_Supervised_Learning
 )
 
-train_data = data_train_Supervised_Learning
-train_labels = labels_train_Supervised_Learning
-test_data = data_test_Supervised_Learning
-test_labels = labels_test_Supervised_Learning
 
 
 #####################################################################
 #                          DEEP LEARNING                            #
 #####################################################################
+
+neural_network_model = NeuralNetworkRegressionModel()
+trained_model, history = neural_network_model.fit_and_evaluate(
+    data_train_Supervised_Learning,
+    labels_train_Supervised_Learning,
+    data_test_Supervised_Learning,
+    labels_test_Supervised_Learning
+)
 
 
 
@@ -354,12 +359,12 @@ test_labels = labels_test_Supervised_Learning
 #####################################################################
 
 hierarchical_clustering = HierarchicalClustering()
-hierarchical_clustering.see_cluster_plots(train_data)
+hierarchical_clustering.see_cluster_plots(data_test_Supervised_Learning)
 
 
 kmeans_clustering = KmeansClustering()
-kmeans_clustering.see_optimize_k(train_data)
+kmeans_clustering.see_optimize_k(data_train_Supervised_Learning)
 
 
 som_clustering = SOMClustering()
-som_clustering.see_som_clustering(train_data)
+som_clustering.see_som_clustering(data_train_Supervised_Learning)

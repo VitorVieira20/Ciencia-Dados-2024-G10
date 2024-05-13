@@ -35,5 +35,5 @@ def predict_house_price():
     return response
 
 if __name__ == "__main__":
-    print("Starting Python Flask Server for Our Application")
+    print("Starting Python Flask Server for Our Application - House Price Prediction")
     app.run()

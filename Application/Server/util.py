@@ -42,7 +42,7 @@ def load_columns():
     global __model
 
     # Folder created in the Jupyter Notebook or another with the same structure
-    models_dir = '../../Project/Models1/'
+    models_dir = '../../Project/Models/'
 
     data_columns_path = models_dir + 'data_columns.json'
 
