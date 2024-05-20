@@ -1,5 +1,6 @@
+import numpy as np
 from sklearn.linear_model import LinearRegression
-from sklearn.metrics import mean_squared_error, r2_score, make_scorer
+from sklearn.metrics import mean_squared_error, r2_score, make_scorer, mean_absolute_error
 from sklearn.model_selection import GridSearchCV
 
 # Importing custom functions from shared_functions module
@@ -54,13 +55,19 @@ class LinearRegressionModel:
         # Making predictions on test data
         linear_predictions = best_linear_regression_model.predict(data_test)
 
-        # Calculating MSE and R^2 scores
-        linear_mse = mean_squared_error(labels_test, linear_predictions)
+        # Calculating Metrics
         linear_r2 = r2_score(labels_test, linear_predictions)
+        linear_mae = mean_absolute_error(labels_test, linear_predictions)
+        linear_mse = mean_squared_error(labels_test, linear_predictions)
+        linear_rmse = np.sqrt(linear_mse)
+        linear_mape = np.mean(np.abs((labels_test - linear_predictions) / labels_test)) * 100
 
         # Printing evaluation metrics
-        print("Linear Regression MSE:", linear_mse)
         print("Linear Regression R^2:", linear_r2)
+        print("Mean Absolute Error (MAE):", linear_mae)
+        print("Mean Squared Error (MSE):", linear_mse)
+        print("Root Mean Squared Error (RMSE):", linear_rmse)
+        print("Mean Absolute Percentage Error (MAPE):", linear_mape)
         print("-----------------------------------------------------\n")
 
         # Plotting predictions and residuals

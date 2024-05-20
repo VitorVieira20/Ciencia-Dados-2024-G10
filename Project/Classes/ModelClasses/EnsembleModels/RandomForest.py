@@ -1,5 +1,6 @@
+import numpy as np
 from sklearn.ensemble import RandomForestRegressor
-from sklearn.metrics import mean_squared_error, r2_score
+from sklearn.metrics import mean_squared_error, r2_score, mean_absolute_error
 from sklearn.model_selection import GridSearchCV
 
 # Importing custom functions from shared_functions module
@@ -41,16 +42,26 @@ class RandomForestModel:
         # Fitting the model and tuning hyperparameters
         grid_search.fit(data_train, labels_train)
 
-        # Getting the best parameters and R^2 score
-        print("Best Random Forest Parameters:", grid_search.best_params_)
-        print("Best R^2 Score:", grid_search.best_score_)
-        print("-----------------------------------------------------\n")
-
         # Getting the best trained model
         best_rf_model = grid_search.best_estimator_
 
         # Making predictions on test data
         rf_predictions = best_rf_model.predict(data_test)
+
+        # Calculating Metrics
+        rf_mae = mean_absolute_error(labels_test, rf_predictions)
+        rf_mse = mean_squared_error(labels_test, rf_predictions)
+        rf_rmse = np.sqrt(rf_mse)
+        rf_mape = np.mean(np.abs((labels_test - rf_predictions) / labels_test)) * 100
+
+        # Getting the best parameters and R^2 score
+        print("Best Random Forest Parameters:", grid_search.best_params_)
+        print("Best R^2 Score:", grid_search.best_score_)
+        print("Mean Absolute Error (MAE):", rf_mae)
+        print("Mean Squared Error (MSE):", rf_mse)
+        print("Root Mean Squared Error (RMSE):", rf_rmse)
+        print("Mean Absolute Percentage Error (MAPE):", rf_mape)
+        print("-----------------------------------------------------\n")
 
         # Plotting predictions and residuals
         models_predictions_plot(labels_test, rf_predictions, 'Random Forest')

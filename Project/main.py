@@ -39,6 +39,7 @@ from Project.Classes.Shared.shared_functions import print_shape
 from Project.Classes.Shared.shared_functions import plot_data_visualizations
 from Project.Classes.Shared.shared_functions import print_hypothesis_result
 from Project.Classes.Shared.shared_functions import data_for_KNN
+from Project.Classes.Shared.shared_functions import normalize_data_for_clustering
 
 #####################################################################
 #                       LOAD AND CLEAN DATA                         #
@@ -205,7 +206,7 @@ ms.select_model()
 KNN_data = new_features
 X_train_KNN, X_test_KNN, y_train_KNN, y_test_KNN = data_for_KNN(KNN_data)
 
-knn = KNNRegression(k=3)
+knn = KNNRegression(k=7)
 knn.fit(X_train_KNN, y_train_KNN)
 
 knn.evaluate(X_test_KNN, y_test_KNN)
@@ -358,13 +359,18 @@ trained_model, history = neural_network_model.fit_and_evaluate(
 #                            CLUSTERING                             #
 #####################################################################
 
+data_train_normalized, data_test_normalized = normalize_data_for_clustering(
+    data_train_Supervised_Learning,
+    data_test_Supervised_Learning
+)
+
 hierarchical_clustering = HierarchicalClustering()
-hierarchical_clustering.see_cluster_plots(data_test_Supervised_Learning)
+hierarchical_clustering.see_cluster_plots(data_test_normalized)
 
 
 kmeans_clustering = KmeansClustering()
-kmeans_clustering.see_optimize_k(data_train_Supervised_Learning)
+kmeans_clustering.see_k_means(data_train_normalized, data_test_normalized)
 
 
 som_clustering = SOMClustering()
-som_clustering.see_som_clustering(data_train_Supervised_Learning)
+som_clustering.see_som_clustering(data_train_normalized)

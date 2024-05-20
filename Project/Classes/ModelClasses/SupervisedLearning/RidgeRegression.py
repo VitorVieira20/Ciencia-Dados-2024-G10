@@ -1,5 +1,6 @@
+import numpy as np
 from sklearn.linear_model import Ridge
-from sklearn.metrics import mean_squared_error, r2_score
+from sklearn.metrics import mean_squared_error, r2_score, mean_absolute_error
 from sklearn.model_selection import GridSearchCV
 
 # Importing custom functions from shared_functions module
@@ -37,16 +38,26 @@ class RidgeRegressionModel:
         # Fitting the model and tuning hyperparameters
         grid_search.fit(data_train, labels_train)
 
-        # Getting the best parameters and R^2 score
-        print("Best Ridge Regression Parameters:", grid_search.best_params_)
-        print("Best R^2 Score:", grid_search.best_score_)
-        print("-----------------------------------------------------\n")
-
         # Getting the best trained model
         best_ridge_model = grid_search.best_estimator_
 
         # Making predictions on test data
         ridge_predictions = best_ridge_model.predict(data_test)
+
+        # Calculate Metrics
+        ridge_mae = mean_absolute_error(labels_test, ridge_predictions)
+        ridge_mse = mean_squared_error(labels_test, ridge_predictions)
+        ridge_rmse = np.sqrt(ridge_mse)
+        ridge_mape = np.mean(np.abs((labels_test - ridge_predictions) / labels_test)) * 100
+
+        # Getting the best parameters and Metrics
+        print("Best Ridge Regression Parameters:", grid_search.best_params_)
+        print("Best R^2 Score:", grid_search.best_score_)
+        print("Ridge Regression MAE:", ridge_mae)
+        print("Ridge Regression MSE:", ridge_mse)
+        print("Ridge Regression Root Mean Squared Error (RMSE):", ridge_rmse)
+        print("Ridge Regression Mean Absolute Percentage Error (MAPE):", ridge_mape)
+        print("-----------------------------------------------------\n")
 
         # Plotting predictions and residuals
         models_predictions_plot(labels_test, ridge_predictions, 'Ridge Regression')

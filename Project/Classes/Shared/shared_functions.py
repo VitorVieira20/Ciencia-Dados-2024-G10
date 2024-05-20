@@ -1,5 +1,7 @@
+import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+from sklearn.preprocessing import StandardScaler
 
 from Project.Classes.Shared.visualize_data import VisualizeData
 
@@ -56,6 +58,27 @@ def data_for_KNN(data):
     y_train_data.reset_index(drop=True, inplace=True)
 
     return X_train_data, X_test_data, y_train_data, y_test_data
+
+def normalize_data_for_clustering(data_train, data_test):
+    X_train = data_train.iloc[:, :14]
+    X_test = data_test.iloc[:, :14]
+
+    if np.any(np.isnan(X_train)) or np.any(np.isinf(X_train)):
+        X_train = X_train[~np.isnan(X_train).any(axis=1)]
+        X_train = X_train[~np.isinf(X_train).any(axis=1)]
+
+    if np.any(np.isnan(X_test)) or np.any(np.isinf(X_test)):
+        X_test = X_test[~np.isnan(X_test).any(axis=1)]
+        X_test = X_test[~np.isinf(X_test).any(axis=1)]
+
+    scaler = StandardScaler()
+    data_train_normalized = scaler.fit_transform(X_train)
+    data_test_normalized = scaler.transform(X_test)
+
+    data_train_normalized = pd.DataFrame(data_train_normalized, columns=X_train.columns)
+    data_test_normalized = pd.DataFrame(data_test_normalized, columns=X_test.columns)
+
+    return data_train_normalized, data_test_normalized
 
 def models_predictions_plot(test_labels, model_predictions, model_name):
     plt.figure(figsize=(10, 6))

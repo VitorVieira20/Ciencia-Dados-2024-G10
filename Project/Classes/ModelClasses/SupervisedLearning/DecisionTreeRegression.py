@@ -1,3 +1,5 @@
+import numpy as np
+from sklearn.metrics import mean_absolute_error, mean_squared_error
 from sklearn.model_selection import GridSearchCV
 from sklearn.tree import DecisionTreeRegressor
 
@@ -39,16 +41,26 @@ class DecisionTreeRegressionModel:
         # Fitting the model and tuning hyperparameters
         grid_search.fit(data_train, labels_train)
 
-        # Getting the best hyperparameters and R^2 score
-        print("Best Hyperparameters:", grid_search.best_params_)
-        print("Best R^2 Score:", grid_search.best_score_)
-        print("-----------------------------------------------------\n")
-
         # Getting the best trained model
         best_dt_model = grid_search.best_estimator_
 
         # Making predictions on test data
         dt_predictions = best_dt_model.predict(data_test)
+
+        # Calculating metrics
+        dt_mae = mean_absolute_error(labels_test, dt_predictions)
+        dt_mse = mean_squared_error(labels_test, dt_predictions)
+        dt_rmse = np.sqrt(dt_mse)
+        dt_mape = np.mean(np.abs((labels_test - dt_predictions) / labels_test)) * 100
+
+        # Getting the best hyperparameters Metrics
+        print("Best Hyperparameters:", grid_search.best_params_)
+        print("Best R^2 Score:", grid_search.best_score_)
+        print("Mean Absolute Error (MAE):", dt_mae)
+        print("Mean Squared Error (MSE):", dt_mse)
+        print("Root Mean Squared Error (RMSE):", dt_rmse)
+        print("Mean Absolute Percentage Error (MAPE):", dt_mape)
+        print("-----------------------------------------------------\n")
 
         # Plotting predictions and residuals
         models_predictions_plot(labels_test, dt_predictions, 'Decision Tree Regression')

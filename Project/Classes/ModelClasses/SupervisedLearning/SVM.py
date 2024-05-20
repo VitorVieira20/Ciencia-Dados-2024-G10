@@ -1,3 +1,5 @@
+import numpy as np
+from sklearn.metrics import mean_absolute_error, mean_squared_error
 from sklearn.model_selection import GridSearchCV
 from sklearn.svm import SVR
 
@@ -37,16 +39,26 @@ class SVMModel:
         svm_grid_search = GridSearchCV(svm_model, hyperparameters, cv=5, scoring='r2', verbose=1, n_jobs=-1)
         svm_grid_search.fit(data_train, labels_train)
 
-        # Getting the best parameters and R^2 score
-        print("Best parameters found:", svm_grid_search.best_params_)
-        print("Best R^2 score found:", svm_grid_search.best_score_)
-        print("-----------------------------------------------------\n")
-
         # Getting the best trained model
         best_svm_model = svm_grid_search.best_estimator_
 
         # Making predictions on test data
         svm_predictions = best_svm_model.predict(data_test)
+
+        # Metrics Calculations
+        svm_mae = mean_absolute_error(labels_test, svm_predictions)
+        svm_mse = mean_squared_error(labels_test, svm_predictions)
+        svm_rmse = np.sqrt(svm_mse)
+        svm_mape = np.mean(np.abs((labels_test - svm_predictions) / labels_test)) * 100
+
+        # Getting the best parameters and R^2 score
+        print("Best parameters found:", svm_grid_search.best_params_)
+        print("Best R^2 score found:", svm_grid_search.best_score_)
+        print("Mean Absolute Error (MAE):", svm_mae)
+        print("Mean Squared Error (MSE):", svm_mse)
+        print("Root Mean Squared Error (RMSE):", svm_rmse)
+        print("Mean Absolute Percentage Error (MAPE):", svm_mape)
+        print("-----------------------------------------------------\n")
 
         # Plotting predictions and residuals
         models_predictions_plot(labels_test, svm_predictions, 'SVM')

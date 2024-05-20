@@ -1,3 +1,5 @@
+import numpy as np
+from sklearn.metrics import mean_absolute_error, mean_squared_error
 from sklearn.model_selection import GridSearchCV
 from sklearn.neural_network import MLPRegressor
 
@@ -42,16 +44,26 @@ class MLPModel:
         # Fitting the model and tuning hyperparameters
         grid_search.fit(data_train, labels_train)
 
-        # Getting the best hyperparameters and R^2 score
-        print("Best Hyperparameters:", grid_search.best_params_)
-        print("Best R^2 Score:", grid_search.best_score_)
-        print("-----------------------------------------------------\n")
-
         # Getting the best trained model
         best_mlp_model = grid_search.best_estimator_
 
         # Making predictions on test data
         mlp_predictions = best_mlp_model.predict(data_test)
+
+        # Metrics Calculations
+        mlp_mae = mean_absolute_error(labels_test, mlp_predictions)
+        mlp_mse = mean_squared_error(labels_test, mlp_predictions)
+        mlp_rmse = np.sqrt(mlp_mse)
+        mlp_mape = np.mean(np.abs((labels_test - mlp_predictions) / labels_test)) * 100
+
+        # Getting the best hyperparameters and Metrics
+        print("Best Hyperparameters:", grid_search.best_params_)
+        print("Best R^2 Score:", grid_search.best_score_)
+        print("Mean Absolute Error (MAE):", mlp_mae)
+        print("Mean Squared Error (MSE):", mlp_mse)
+        print("Root Mean Squared Error (RMSE):", mlp_rmse)
+        print("Mean Absolute Percentage Error (MAPE):", mlp_mape)
+        print("-----------------------------------------------------\n")
 
         # Plotting predictions and residuals
         models_predictions_plot(labels_test, mlp_predictions, 'MLP')

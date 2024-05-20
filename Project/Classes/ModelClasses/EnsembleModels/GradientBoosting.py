@@ -1,5 +1,6 @@
+import numpy as np
 from sklearn.ensemble import GradientBoostingRegressor
-from sklearn.metrics import mean_squared_error, r2_score
+from sklearn.metrics import mean_squared_error, r2_score, mean_absolute_error
 from sklearn.model_selection import GridSearchCV
 
 # Importing custom functions from shared_functions module
@@ -40,16 +41,26 @@ class GradientBoostingModel:
         # Fitting the model and tuning hyperparameters
         grid_search.fit(data_train, labels_train)
 
-        # Getting the best parameters and R^2 score
-        print("Best Gradient Boosting Parameters:", grid_search.best_params_)
-        print("Best R^2 Score:", grid_search.best_score_)
-        print("-----------------------------------------------------\n")
-
         # Getting the best trained model
         best_gb_model = grid_search.best_estimator_
 
         # Making predictions on test data
         gb_predictions = best_gb_model.predict(data_test)
+
+        # Metrics Calculations
+        gb_mae = mean_absolute_error(labels_test, gb_predictions)
+        gb_mse = mean_squared_error(labels_test, gb_predictions)
+        gb_rmse = np.sqrt(gb_mse)
+        gb_mape = np.mean(np.abs((labels_test - gb_predictions) / labels_test)) * 100
+
+        # Getting the best parameters and R^2 score
+        print("Best Gradient Boosting Parameters:", grid_search.best_params_)
+        print("Best R^2 Score:", grid_search.best_score_)
+        print("Mean Absolute Error (MAE):", gb_mae)
+        print("Mean Squared Error (MSE):", gb_mse)
+        print("Root Mean Squared Error (RMSE):", gb_rmse)
+        print("Mean Absolute Percentage Error (MAPE):", gb_mape)
+        print("-----------------------------------------------------\n")
 
         # Plotting predictions and residuals
         models_predictions_plot(labels_test, gb_predictions, 'Gradient Boosting')

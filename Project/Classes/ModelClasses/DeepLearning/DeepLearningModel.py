@@ -1,4 +1,4 @@
-from sklearn.metrics import r2_score
+from sklearn.metrics import r2_score, mean_absolute_error, mean_squared_error
 from sklearn.preprocessing import StandardScaler
 from keras.models import Sequential
 from keras.layers import Dense
@@ -51,11 +51,15 @@ class NeuralNetworkRegressionModel:
 
         # Calculate R-squared score
         test_r2_score = r2_score(test_labels, predictions)
+        test_mae = mean_absolute_error(test_labels, predictions)
+        test_rmse = mean_squared_error(test_labels, predictions, squared=False)
 
         # Print evaluation metrics
         print("Test Loss:", test_loss)
-        print("Test MSE:", test_mse)
         print("Test R^2 Score:", test_r2_score)
+        print("Test MAE:", test_mae)
+        print("Test MSE:", test_mse)
+        print("Test RMSE:", test_rmse)
         print("-----------------------------------------------------\n")
 
         # Plot training history

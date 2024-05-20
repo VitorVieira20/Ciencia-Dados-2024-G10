@@ -1,5 +1,5 @@
 import numpy as np
-from sklearn.metrics import r2_score
+from sklearn.metrics import r2_score, mean_absolute_error, mean_squared_error
 
 
 class KNNRegression:
@@ -100,10 +100,14 @@ class KNNRegression:
         # Making predictions on test data
         predictions = self.predict(X_test)
 
-        # Calculating R² score
+        # Calculating metrics
         r2 = r2_score(y_test, predictions)
+        mae = mean_absolute_error(y_test, predictions)
+        mse = mean_squared_error(y_test, predictions)
 
-
-        print("KNN Regression Score:", r2)
+        print("KNN Regression Metrics:")
+        print("R² Score:", r2)
+        print("MAE:", mae)
+        print("MSE:", mse)
         print("-----------------------------------------------------\n")
-        return r2
+        return mae, mse, r2
