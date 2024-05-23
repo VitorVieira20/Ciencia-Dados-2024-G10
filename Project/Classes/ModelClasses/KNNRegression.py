@@ -18,7 +18,7 @@ class KNNRegression:
         evaluate(self, X_test, y_test): Calculates and prints the R² score of the model.
     """
 
-    def __init__(self, k=3):
+    def __init__(self, k=7):
         """
         Initializes the KNN regressor with the specified value of k.
 

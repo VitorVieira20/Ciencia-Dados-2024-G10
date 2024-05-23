@@ -54,9 +54,9 @@ def load_columns():
             break
 
     if best_model_dir is not None:
-        print("Diretório do melhor modelo encontrado:", best_model_dir)
+        print("Pasta do melhor modelo encontrada:", best_model_dir)
     else:
-        print("Nenhum diretório começando com 'Best' encontrado em", models_dir)
+        print("Nenhuma pasta começada com 'Best' encontrada em", models_dir)
 
     best_model_path = best_model_dir + '/best_model.pkl'
     print(best_model_path)
