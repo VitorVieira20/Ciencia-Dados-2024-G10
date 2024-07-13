@@ -1,4 +1,4 @@
-# Data Science - G10 - Bengaluru  House Pricing
+# Data Science - Bengaluru  House Pricing
 
 ## Project Overview
 
@@ -20,4 +20,8 @@ To successfully utilize the project:
 3. Update the path to the models folder in the `util.py` file of the Application.
 4. Run `server.py` and open `app.html` in your browser.
 5. You can now test the model using the provided interface.
+
+### Dataset
+
+https://www.kaggle.com/datasets/amitabhajoy/bengaluru-house-price-data
 
